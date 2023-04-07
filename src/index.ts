@@ -1,9 +1,7 @@
-(async () => {
-	(await import('dotenv')).config({path: '../config.env'});
-})();
+require('dotenv').config({ path: './config.env' });
 import mongoose from 'mongoose';
-import * as serverShutter from './utils/serverShutter';
 import app from './app';
+import * as serverShutter from './utils/serverShutter';
 
 //#region db connection
 const db = process.env.DATABASE_LOCAL || 'error';

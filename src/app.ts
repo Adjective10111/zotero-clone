@@ -1,11 +1,11 @@
-import path from 'path';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import express from 'express';
-import morgan from 'morgan';
+import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
-import cookieParser from 'cookie-parser';
-import compression from 'compression';
+import morgan from 'morgan';
+import path from 'path';
 //import xss from 'xss-clean';
 
 import errorHandler from './utils/errorHandler';
