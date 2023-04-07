@@ -92,7 +92,7 @@ type CustomRequestHandler<Req=Request, Res=Response, Ret= Promise<void> | void> 
 
 type CRUD = 'bulkCreate' | 'create' | 'getAll' | 'getOne' | 'patch' | 'delete';
 
-export class Controller<DocType extends mongoose.Model<any>> {
+export default class Controller<DocType extends mongoose.Model<any>> {
 	private modelName: string;
 
 	constructor(

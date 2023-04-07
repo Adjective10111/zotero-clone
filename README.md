@@ -2,7 +2,7 @@
 
 It's a clone of zotero implemented by typescript and mongodb.
 This is the backend part of it for synchronization using accounts.
-It also provides an API for information fetching.
+It also provides an API for information fetching, citation, bibliography, advanced search and more.
 
 ## API
 
