@@ -56,6 +56,13 @@ export const genericUserSchemaDefinition = {
 	passwordResetExpiration: Date
 };
 
+export interface passwordManagementMethods {
+	checkPassword: (candidatePass: string) => Promise<boolean>;
+	allowedSession: (timestampInSeconds: number) => boolean;
+	createPasswordResetToken: () => Promise<string>;
+	terminateSessions: () => Promise<void>;
+}
+
 export const passwordManagement = (schema: mongoose.Schema): void => {
 	// control password changes
 	schema.pre('save', async function(next) {
@@ -69,7 +76,7 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 		next();
 	});
 
-	schema.methods.checkPassword = async function(candidatePass: string) {
+	schema.methods.checkPassword = async function(candidatePass: string): Promise<boolean> {
 		return await bcrypt.compare(candidatePass, this.password);
 	};
 
@@ -94,7 +101,7 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 	 * sets the allowedSessions as termination has been done
 	 * and saves it by seconds, NOT milliseconds
 	 */
-	schema.methods.terminateSessions = async function() {
+	schema.methods.terminateSessions = async function(): Promise<void> {
 		this.allowedSessionsAfter = Date.now() / 1000;
 		await this.save();
 	};
