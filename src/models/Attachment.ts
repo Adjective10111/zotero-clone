@@ -1,57 +1,43 @@
-import { model, Schema, Types } from "mongoose";
-import { ICollection } from "./Collection";
-import { IItem } from "./Item";
-import { ILibrary } from "./Library";
-
-export interface INote {
-	reference: IItem | ILibrary | ICollection;
-	text: string;
-}
+import { Schema, Types, model, type Model } from "mongoose";
+import { type ITimestampedSchema } from '../utils/schemaFactory';
+import { type IItem } from "./Item";
 
 export interface IWebsite {
-	reference: IItem,
-	html?: string,
-	url?: string
+	html?: string;
+	url?: string;
 }
 
-export type IAttachments = INote | IWebsite;
+export interface IFile {
+	filename: string;
+	pages?: number
+}
 
-const attachmentSchema = new Schema<IAttachments>({
-	reference: {
+type AttachmentTypes = ITimestampedSchema & IWebsite & IFile;
+
+export interface IAttachment extends AttachmentTypes {
+	parent: IItem;
+}
+
+interface IAttachmentsMethods {
+	populateReference(): Promise<void>;
+}
+
+type AttachmentModel = Model<IAttachment, {}, IAttachmentsMethods>;
+
+const attachmentSchema = new Schema<IAttachment, AttachmentModel, IAttachmentsMethods>({
+	parent: {
 		type: Types.ObjectId,
 		required: [true, 'should be attachment']
 	},
-	// note
-	text: String,
 	// website
 	html: String,
 	url: String,
+	// file
+	filename: String,
+	pages: Number
 }, {
-	toJSON: {
-		virtuals: true
-	}
+	timestamps: true
 });
 
-attachmentSchema.virtual('item', {
-	ref: 'Item',
-	localField: 'reference',
-	foreignField: '_id',
-	justOne: true
-});
-
-attachmentSchema.virtual('collection', {
-	ref: 'Collection',
-	localField: 'reference',
-	foreignField: '_id',
-	justOne: true
-});
-
-attachmentSchema.virtual('library', {
-	ref: 'Library',
-	localField: 'reference',
-	foreignField: '_id',
-	justOne: true
-});
-
-// const Attachment = model<IAttachments>('Attachment', attachmentSchema);
-// export default Attachment;
+const Attachment = model<IAttachment, AttachmentModel>('Attachment', attachmentSchema);
+export default Attachment;

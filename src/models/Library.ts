@@ -17,7 +17,7 @@ const librarySchema = new Schema<ILibrary>({
 	user: {
 		type: mongoose.Types.ObjectId,
 		ref: 'User',
-		required: [true, 'hierarchy should be for someone']
+		required: [true, 'library should be for someone']
 	},
 	name: {
 		type: String,
@@ -39,6 +39,16 @@ const librarySchema = new Schema<ILibrary>({
 		type: mongoose.Types.ObjectId,
 		ref: 'Collection'
 	}
+}, {
+	toJSON: {
+		virtuals: true
+	}
+});
+
+librarySchema.virtual('collections', {
+	ref: 'Collection',
+	foreignField: 'parent',
+	localField: '_id'
 });
 
 const Library = model<ILibrary>('Library', librarySchema);

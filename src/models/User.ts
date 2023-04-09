@@ -1,10 +1,13 @@
-import { model, Schema } from "mongoose";
+import { Schema, model, type Model } from "mongoose";
 import validator from 'validator';
-import { genericUser, passwordManagement } from "../utils/schemaFactory";
+import { genericUser, passwordManagement, type passwordManagementMethods } from "../utils/schemaFactory";
 
 export interface IUser extends genericUser { }
+export interface IUserMethods extends passwordManagementMethods { }
 
-const userSchema = new Schema<IUser>({
+type UserModel = Model<IUser, {}, IUserMethods>;
+
+const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 	photo: {
 		type: String
 	},
@@ -38,5 +41,5 @@ const userSchema = new Schema<IUser>({
 
 passwordManagement(userSchema);
 
-const User = model<IUser>('User', userSchema);
+const User = model<IUser, UserModel>('User', userSchema);
 export default User;

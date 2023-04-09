@@ -3,6 +3,11 @@ import crypto from 'crypto';
 import mongoose from 'mongoose';
 import validator from 'validator';
 
+export interface ITimestampedSchema {
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 //#region user
 /**
  * generic user creation

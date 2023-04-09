@@ -1,49 +1,58 @@
-import mongoose, { model, Schema } from "mongoose";
-import { IAttachments } from "./Attachment";
-import { ICollection } from "./Collection";
-import { IFile } from "./FileMetadata";
-import { ILibrary } from "./Library";
+import mongoose, { Schema, Types, model, type Model } from "mongoose";
+import { type ITimestampedSchema } from "../utils/schemaFactory";
+import { type IAttachment } from "./Attachment";
+import { type ICollection } from "./Collection";
+import { type INote } from "./Note";
 
-export interface IItem {
+export interface IItem extends ITimestampedSchema {
+	parent: ICollection;
+	
 	name: string;
-	files?: IFile[];
-	attachments?: IAttachments[];
-	parent: ILibrary | ICollection;
+	itemType: string;
+	metadata?: object;
+
+	attachments?: IAttachment[];
+	notes?: INote[]
 }
 
-const itemSchema = new Schema<IItem>({
+type ItemModel = Model<IItem>;
+
+const itemSchema = new Schema<IItem, ItemModel>({
+	parent: {
+		type: mongoose.Types.ObjectId,
+		ref: 'Collection',
+		required: [true, 'must belong to a Collection']
+	},
 	name: {
 		type: String,
 		required: [true, 'must be named']
 	},
-	parent: {
-		type: mongoose.Types.ObjectId,
-		required: [true, 'must belong to a Library or Collection']
+	itemType: {
+		type: String,
+		default: 'unknown'
+	},
+	metadata: {
+		type: Object,
+		default: () => ({})
 	}
 }, {
+	timestamps: true,
 	toJSON: {
 		virtuals: true
 	}
 });
 
-itemSchema.virtual('library', {
-    ref: 'Library',
-    localField: 'parent',
-    foreignField: '_id',
-    justOne: true
+itemSchema.virtual('attachments', {
+	ref: 'Attachment',
+	foreignField: 'parent',
+	localField: '_id'
 });
 
-itemSchema.virtual('collection', {
-    ref: 'Collection',
-    localField: 'parent',
-    foreignField: '_id',
-    justOne: true
+itemSchema.virtual('notes', {
+	ref: 'Note',
+	foreignField: 'parent',
+	localField: '_id'
 });
 
-itemSchema.pre(/^find/, function(next) {
-	this.populate('library').populate('collection');
-	next();
-});
-
-const Item = model<IItem>('Item', itemSchema);
+const Item = model<IItem, ItemModel>('Item', itemSchema);
 export default Item;
