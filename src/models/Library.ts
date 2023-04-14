@@ -7,43 +7,41 @@ export interface ILibrary {
 
 	name: string;
 	collections?: ICollection[];
-	myPublications: ICollection;
 	duplicates: ICollection;
 	unfiledItems: ICollection;
 	bin: ICollection;
 }
 
-const librarySchema = new Schema<ILibrary>({
-	user: {
-		type: mongoose.Types.ObjectId,
-		ref: 'User',
-		required: [true, 'library should be for someone']
+const librarySchema = new Schema<ILibrary>(
+	{
+		user: {
+			type: mongoose.Types.ObjectId,
+			ref: 'User',
+			required: [true, 'library should be for someone']
+		},
+		name: {
+			type: String,
+			required: [true, 'library must have a name']
+		},
+		duplicates: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Collection'
+		},
+		unfiledItems: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Collection'
+		},
+		bin: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Collection'
+		}
 	},
-	name: {
-		type: String,
-		required: [true, 'library must have a name']
-	},
-	myPublications: {
-		type: mongoose.Types.ObjectId,
-		ref: 'Collection'
-	},
-	duplicates: {
-		type: mongoose.Types.ObjectId,
-		ref: 'Collection'
-	},
-	unfiledItems: {
-		type: mongoose.Types.ObjectId,
-		ref: 'Collection'
-	},
-	bin: {
-		type: mongoose.Types.ObjectId,
-		ref: 'Collection'
+	{
+		toJSON: {
+			virtuals: true
+		}
 	}
-}, {
-	toJSON: {
-		virtuals: true
-	}
-});
+);
 
 librarySchema.virtual('collections', {
 	ref: 'Collection',
