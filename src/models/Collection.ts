@@ -1,53 +1,67 @@
-import mongoose, { Schema, model, type HydratedDocument, type Model } from "mongoose";
-import { type IItem } from "./Item";
-import { type ILibrary } from "./Library";
-import { type INote } from "./Note";
+import mongoose, {
+	Schema,
+	model,
+	type FilterQuery,
+	type Model
+} from 'mongoose';
+import { type Doc } from '../utils/schemaFactory';
+import Item, { type IItem } from './Item';
+import { type ILibrary } from './Library';
+import { type INote } from './Note';
 
-interface libraryOwned {
+interface IStdCollection {
 	name: string;
 	parent: ILibrary;
-}
 
-export interface ISearchingCollection extends libraryOwned {
-	type: 'SearchingCollection'
-	searchQuery: string;
-}
-
-export interface ICollection extends libraryOwned {
-	type: 'Collection'
 	items?: IItem[];
+}
+
+export interface ISearchingCollection extends IStdCollection {
+	type: 'SearchingCollection';
+	searchQuery: FilterQuery<IItem>;
+}
+
+export interface ICollection extends IStdCollection {
+	type: 'Collection';
 	notes?: INote[];
 }
 
 export type AnyCollection = ICollection | ISearchingCollection;
-type Doc<T> = HydratedDocument<T>;
 
 interface CollectionModel extends Model<AnyCollection> {
-	isSearchingCollection(doc: Doc<AnyCollection>): doc is Doc<ISearchingCollection>;
-	isNormalCollection(doc: Doc<AnyCollection>): doc is Doc<ICollection>;
+	isSearchingCollection(
+		doc: Doc<AnyCollection>
+	): doc is Doc<ISearchingCollection>;
+
+	searchItems(
+		doc: Doc<ISearchingCollection>
+	): Promise<Doc<ISearchingCollection>>;
 }
 
-const collectionSchema = new Schema<AnyCollection, CollectionModel>({
-	name: {
-		type: String,
-		required: [true, 'collection must be named']
+const collectionSchema = new Schema<AnyCollection, CollectionModel>(
+	{
+		name: {
+			type: String,
+			required: [true, 'collection must be named']
+		},
+		parent: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Library',
+			required: [true, 'it must belong to a library']
+		},
+
+		type: {
+			type: String,
+			required: [true, 'for better performance include the type']
+		},
+		searchQuery: Object
 	},
-	parent: {
-		type: mongoose.Types.ObjectId,
-		ref: 'Library',
-		required: [true, 'it must belong to a library']
-	},
-	
-	type: {
-		type: String,
-		required: [true, 'for better performance include the type']
-	},
-	searchQuery: String
-}, {
-	toJSON: {
-		virtuals: true
+	{
+		toJSON: {
+			virtuals: true
+		}
 	}
-});
+);
 
 collectionSchema.virtual('items', {
 	ref: 'Item',
@@ -61,15 +75,21 @@ collectionSchema.virtual('notes', {
 	localField: '_id'
 });
 
-collectionSchema.statics.isSearchingCollection = 
-	function(doc: Doc<AnyCollection>): doc is Doc<ISearchingCollection> {
-		return doc.type === 'SearchingCollection';
-	}
+collectionSchema.statics.isSearchingCollection = function (
+	doc: Doc<AnyCollection>
+): doc is Doc<ISearchingCollection> {
+	return doc.type === 'SearchingCollection';
+};
 
-collectionSchema.statics.isNormalCollection = 
-	function(doc: Doc<AnyCollection>): doc is Doc<ICollection> {
-		return doc.type === 'Collection';
-	}
+collectionSchema.statics.searchItems = async function (
+	doc: Doc<ISearchingCollection>
+): Promise<Doc<ISearchingCollection>> {
+	doc.items = await Item.find(doc.searchQuery);
+	return doc;
+};
 
-const Collection = model<AnyCollection, CollectionModel>('Collection', collectionSchema);
+const Collection = model<AnyCollection, CollectionModel>(
+	'Collection',
+	collectionSchema
+);
 export default Collection;
