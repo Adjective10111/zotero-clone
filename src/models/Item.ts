@@ -21,7 +21,7 @@ export interface IItem extends ITimestampedSchema {
 	attachments?: IAttachment[];
 	notes?: INote[];
 
-	related: { name: string; id: Types.ObjectId }[];
+	related: ({ name: string; item: IItem } | IItem)[];
 	tag: ITag[];
 }
 
@@ -56,9 +56,14 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 			default: () => ({})
 		},
 
+		// populate('related.item')
 		related: {
-			type: [{ name: String, id: Types.ObjectId }],
-			ref: 'Item',
+			type: [
+				{
+					name: String,
+					item: { type: Types.ObjectId, ref: 'Item' }
+				}
+			],
 			default: []
 		},
 		tag: {
@@ -100,8 +105,8 @@ itemSchema.methods.relate = async function (
 		doc = temp;
 	}
 
-	doc.related.push({ name: this.name, id: this._id });
-	this.related.push({ name: doc.name, id: doc._id });
+	doc.related.push({ name: this.name, item: this._id });
+	this.related.push({ name: doc.name, item: doc._id });
 
 	await doc.save();
 	await this.save();
