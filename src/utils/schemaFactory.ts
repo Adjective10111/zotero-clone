@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import mongoose from 'mongoose';
+import mongoose, { type HydratedDocument } from 'mongoose';
 import validator from 'validator';
+
+export type Doc<T> = HydratedDocument<T>;
 
 export interface ITimestampedSchema {
 	createdAt: Date;
@@ -70,7 +72,7 @@ export interface passwordManagementMethods {
 
 export const passwordManagement = (schema: mongoose.Schema): void => {
 	// control password changes
-	schema.pre('save', async function(next) {
+	schema.pre('save', async function (next) {
 		if (!this.isModified('password')) return next();
 
 		this.password = await bcrypt.hash(this.password, 12);
@@ -81,15 +83,19 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 		next();
 	});
 
-	schema.methods.checkPassword = async function(candidatePass: string): Promise<boolean> {
+	schema.methods.checkPassword = async function (
+		candidatePass: string
+	): Promise<boolean> {
 		return await bcrypt.compare(candidatePass, this.password);
 	};
 
-	schema.methods.allowedSession = function(timestampInSeconds: number): boolean {
+	schema.methods.allowedSession = function (
+		timestampInSeconds: number
+	): boolean {
 		return this.allowedSessionsAfter < timestampInSeconds;
 	};
 
-	schema.methods.createPasswordResetToken = async function(): Promise<string> {
+	schema.methods.createPasswordResetToken = async function (): Promise<string> {
 		const resetToken = crypto.randomBytes(32).toString('hex');
 		this.passwordResetToken = crypto
 			.createHash('sha256')
@@ -106,7 +112,7 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 	 * sets the allowedSessions as termination has been done
 	 * and saves it by seconds, NOT milliseconds
 	 */
-	schema.methods.terminateSessions = async function(): Promise<void> {
+	schema.methods.terminateSessions = async function (): Promise<void> {
 		this.allowedSessionsAfter = Date.now() / 1000;
 		await this.save();
 	};
@@ -182,7 +188,7 @@ export const genericProductSchemaDefinition = {
  * @param {mongoose.Schema} schema
  */
 export const discountManagement = (schema: mongoose.Schema) => {
-	schema.post('save', function(doc) {
+	schema.post('save', function (doc) {
 		if (
 			doc.isModified('discount') ||
 			doc.isModified('discountExpiration') ||
@@ -191,14 +197,19 @@ export const discountManagement = (schema: mongoose.Schema) => {
 			doc.priceChange();
 	});
 
-	schema.pre(/^find/, async function(next) {
-		if (!this.get('discountExpiration'))
-			throw new Error('invalid schema');
-		if (this.get('discountExpiration') < Date.now() && this.get('discount') !== 0) {
+	schema.pre(/^find/, async function (next) {
+		if (!this.get('discountExpiration')) throw new Error('invalid schema');
+		if (
+			this.get('discountExpiration') < Date.now() &&
+			this.get('discount') !== 0
+		) {
 			this.set('discount', 0);
 			await (await this.exec()).save();
 		}
-		this.set('price', this.get('basePrice') * ((100 - this.get('discount')) / 100));
+		this.set(
+			'price',
+			this.get('basePrice') * ((100 - this.get('discount')) / 100)
+		);
 
 		next();
 	});
