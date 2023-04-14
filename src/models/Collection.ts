@@ -1,9 +1,4 @@
-import mongoose, {
-	Schema,
-	model,
-	type FilterQuery,
-	type Model
-} from 'mongoose';
+import { Schema, Types, model, type FilterQuery, type Model } from 'mongoose';
 import { type Doc } from '../utils/schemaFactory';
 import Item, { type IItem } from './Item';
 import { type ILibrary } from './Library';
@@ -45,7 +40,7 @@ const collectionSchema = new Schema<AnyCollection, CollectionModel>(
 			required: [true, 'collection must be named']
 		},
 		parent: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'Library',
 			required: [true, 'it must belong to a library']
 		},

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types, model, type Model } from 'mongoose';
+import { Schema, Types, model, type Model } from 'mongoose';
 import { type Doc, type ITimestampedSchema } from '../utils/schemaFactory';
 import { type IAttachment } from './Attachment';
 import { type ICollection } from './Collection';
@@ -33,7 +33,7 @@ type ItemModel = Model<IItem, {}, IItemMethods>;
 const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 	{
 		parent: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'Collection',
 			required: [true, 'must belong to a Collection']
 		},

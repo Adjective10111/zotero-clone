@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { type ICollection } from './Collection';
 import { type IUser } from './User';
 
@@ -15,7 +15,7 @@ export interface ILibrary {
 const librarySchema = new Schema<ILibrary>(
 	{
 		user: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'User',
 			required: [true, 'library should be for someone']
 		},
@@ -25,15 +25,15 @@ const librarySchema = new Schema<ILibrary>(
 		},
 
 		duplicates: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'Collection'
 		},
 		unfiledItems: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'Collection'
 		},
 		bin: {
-			type: mongoose.Types.ObjectId,
+			type: Types.ObjectId,
 			ref: 'Collection'
 		}
 	},
