@@ -1,5 +1,4 @@
 import mongoose, { Schema, Types, model, type Model } from 'mongoose';
-import { createError } from '../utils/errorFactory';
 import { type Doc, type ITimestampedSchema } from '../utils/schemaFactory';
 import { type IAttachment } from './Attachment';
 import { type ICollection } from './Collection';
@@ -83,6 +82,9 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 		}
 	}
 );
+
+itemSchema.index({ parent: 1 });
+itemSchema.index({ tag: 1 });
 
 itemSchema.virtual('attachments', {
 	ref: 'Attachment',

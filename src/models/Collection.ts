@@ -63,6 +63,8 @@ const collectionSchema = new Schema<AnyCollection, CollectionModel>(
 	}
 );
 
+collectionSchema.index({ name: 1, parent: 1 }, { unique: true });
+
 collectionSchema.virtual('items', {
 	ref: 'Item',
 	foreignField: 'parent',

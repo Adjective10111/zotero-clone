@@ -1,6 +1,6 @@
-import { Schema, Types, model, type Model } from "mongoose";
+import { Schema, Types, model, type Model } from 'mongoose';
 import { type ITimestampedSchema } from '../utils/schemaFactory';
-import { type IItem } from "./Item";
+import { type IItem } from './Item';
 
 export interface IWebsite {
 	html?: string;
@@ -9,7 +9,7 @@ export interface IWebsite {
 
 export interface IFile {
 	filename: string;
-	pages?: number
+	pages?: number;
 }
 
 type AttachmentTypes = ITimestampedSchema & IWebsite & IFile;
@@ -24,20 +24,32 @@ interface IAttachmentsMethods {
 
 type AttachmentModel = Model<IAttachment, {}, IAttachmentsMethods>;
 
-const attachmentSchema = new Schema<IAttachment, AttachmentModel, IAttachmentsMethods>({
-	parent: {
-		type: Types.ObjectId,
-		required: [true, 'should be attachment']
+const attachmentSchema = new Schema<
+	IAttachment,
+	AttachmentModel,
+	IAttachmentsMethods
+>(
+	{
+		parent: {
+			type: Types.ObjectId,
+			required: [true, 'should be attachment']
+		},
+		// website
+		html: String,
+		url: String,
+		// file
+		filename: String,
+		pages: Number
 	},
-	// website
-	html: String,
-	url: String,
-	// file
-	filename: String,
-	pages: Number
-}, {
-	timestamps: true
-});
+	{
+		timestamps: true
+	}
+);
 
-const Attachment = model<IAttachment, AttachmentModel>('Attachment', attachmentSchema);
+attachmentSchema.index({ parent: 1 });
+
+const Attachment = model<IAttachment, AttachmentModel>(
+	'Attachment',
+	attachmentSchema
+);
 export default Attachment;

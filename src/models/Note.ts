@@ -1,19 +1,19 @@
-import { Schema, Types, model, type Model } from "mongoose";
-import { ITimestampedSchema } from "../utils/schemaFactory";
-import { type ICollection } from "./Collection";
-import { type IItem } from "./Item";
-import { type ILibrary } from "./Library";
+import { Schema, Types, model, type Model } from 'mongoose';
+import { ITimestampedSchema } from '../utils/schemaFactory';
+import { type ICollection } from './Collection';
+import { type IItem } from './Item';
+import { type ILibrary } from './Library';
 
 type ParentModelName = 'item' | 'collection' | 'library';
 
 export interface INote extends ITimestampedSchema {
 	parent: IItem | ICollection | ILibrary;
-	parentModel: ParentModelName
-	
+	parentModel: ParentModelName;
+
 	item?: IItem;
 	collection?: ICollection;
 	library?: ILibrary;
-	
+
 	text: string;
 }
 
@@ -23,25 +23,30 @@ interface INoteMethods {
 
 type NoteModel = Model<INote, {}, INoteMethods>;
 
-const noteSchema = new Schema<INote, NoteModel, INoteMethods>({
-	parent: {
-		type: Types.ObjectId,
-		required: [true, 'must belong to a Parent']
+const noteSchema = new Schema<INote, NoteModel, INoteMethods>(
+	{
+		parent: {
+			type: Types.ObjectId,
+			required: [true, 'must belong to a Parent']
+		},
+		parentModel: {
+			type: String,
+			required: [true, 'Specify the parent model']
+		},
+		text: {
+			type: String,
+			default: ''
+		}
 	},
-	parentModel: {
-		type: String,
-		required: [true, 'Specify the parent model']
-	},
-	text: {
-		type: String,
-		default: ''
+	{
+		timestamps: true,
+		toJSON: {
+			virtuals: true
+		}
 	}
-}, {
-	timestamps: true,
-	toJSON: {
-		virtuals: true
-	}
-});
+);
+
+noteSchema.index({ parent: 1 });
 
 noteSchema.virtual('item', {
 	ref: 'Item',
@@ -64,7 +69,7 @@ noteSchema.virtual('library', {
 	justOne: true
 });
 
-noteSchema.methods.populateReference = async function(): Promise<void> {
+noteSchema.methods.populateReference = async function (): Promise<void> {
 	await this.populate(this.parentModel);
 	this.parent = this[this.parentModel];
 };

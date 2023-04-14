@@ -23,6 +23,7 @@ const librarySchema = new Schema<ILibrary>(
 			type: String,
 			required: [true, 'library must have a name']
 		},
+
 		duplicates: {
 			type: mongoose.Types.ObjectId,
 			ref: 'Collection'
@@ -42,6 +43,8 @@ const librarySchema = new Schema<ILibrary>(
 		}
 	}
 );
+
+librarySchema.index({ user: 1, name: 1 }, { unique: true });
 
 librarySchema.virtual('collections', {
 	ref: 'Collection',
