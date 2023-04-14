@@ -8,15 +8,16 @@ import morgan from 'morgan';
 import path from 'path';
 //import xss from 'xss-clean';
 
+import apiRouter from './routes/apiRouter';
 import errorHandler from './utils/errorHandler';
-//import apiRouter from './routes/apiRoutes';
 //import { unavailable } from './utils/handlerFactory';
 
 const app = express();
 
 // security middlewares
 //app.use(xss());
-app.use(helmet())
+app
+	.use(helmet())
 	.use(mongoSanitize())
 	.use(
 		'/api',
@@ -28,8 +29,9 @@ app.use(helmet())
 	);
 
 // request and response modifiers
-app.use(express.json({limit: '10kb'}))
-	.use(express.urlencoded({extended: true, limit: '10kb'}))
+app
+	.use(express.json({ limit: '10kb' }))
+	.use(express.urlencoded({ extended: true, limit: '10kb' }))
 	.use(cookieParser())
 	.use(compression());
 
@@ -40,9 +42,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'dev') {
 	app.use(morgan('dev'));
 }
+
 app
-//app.use('/api', apiRouter)
-//	.use('*', unavailable)
+	.use('/api', apiRouter)
+	//	.use('*', unavailable)
 	.use(errorHandler);
 
 export default app;
