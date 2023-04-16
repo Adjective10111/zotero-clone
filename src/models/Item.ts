@@ -1,5 +1,5 @@
-import { Schema, Types, model, type Model } from 'mongoose';
-import { type Doc, type ITimestampedSchema } from '../utils/schemaFactory';
+import { model, Schema, Types, type Model } from 'mongoose';
+import { type Doc, type ITimestamped } from '../utils/types';
 import { type IAttachment } from './Attachment';
 import { type ICollection } from './Collection';
 import { type INote } from './Note';
@@ -9,7 +9,7 @@ interface ITag {
 	color: string;
 }
 
-export interface IItem extends ITimestampedSchema {
+export interface IItem extends ITimestamped {
 	parent: ICollection;
 
 	name: string;

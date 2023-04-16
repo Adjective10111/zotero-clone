@@ -1,5 +1,5 @@
-import { Schema, Types, model, type FilterQuery, type Model } from 'mongoose';
-import { type Doc } from '../utils/schemaFactory';
+import { model, Schema, Types, type FilterQuery, type Model } from 'mongoose';
+import { type Doc } from '../utils/types';
 import Item, { type IItem } from './Item';
 import { type ILibrary } from './Library';
 import { type INote } from './Note';

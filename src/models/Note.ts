@@ -1,12 +1,12 @@
-import { Schema, Types, model, type Model } from 'mongoose';
-import { ITimestampedSchema } from '../utils/schemaFactory';
+import { model, Schema, Types, type Model } from 'mongoose';
+import { type ITimestamped } from '../utils/types';
 import { type ICollection } from './Collection';
 import { type IItem } from './Item';
 import { type ILibrary } from './Library';
 
 type ParentModelName = 'item' | 'collection' | 'library';
 
-export interface INote extends ITimestampedSchema {
+export interface INote extends ITimestamped {
 	parent: IItem | ICollection | ILibrary;
 	parentModel: ParentModelName;
 

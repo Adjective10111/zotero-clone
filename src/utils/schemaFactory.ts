@@ -1,14 +1,8 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import mongoose, { type HydratedDocument } from 'mongoose';
+import mongoose from 'mongoose';
 import validator from 'validator';
-
-export type Doc<T> = HydratedDocument<T>;
-
-export interface ITimestampedSchema {
-	createdAt: Date;
-	updatedAt: Date;
-}
+import { type numericString } from './types';
 
 //#region user
 /**
@@ -17,8 +11,6 @@ export interface ITimestampedSchema {
  * 	 photo, name, email, mobile,
  *	 password, passwordResetToken, passwordResetExpiration, allowedSessionsAfter
  */
-type numericString = `${number}`;
-
 export interface genericUser {
 	photo?: string;
 	name: string;

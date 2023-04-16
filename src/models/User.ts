@@ -1,9 +1,13 @@
-import { Schema, model, type Model } from "mongoose";
+import { model, Schema, type Model } from 'mongoose';
 import validator from 'validator';
-import { genericUser, passwordManagement, type passwordManagementMethods } from "../utils/schemaFactory";
+import {
+	genericUser,
+	passwordManagement,
+	type passwordManagementMethods
+} from '../utils/schemaFactory';
 
-export interface IUser extends genericUser { }
-export interface IUserMethods extends passwordManagementMethods { }
+export interface IUser extends genericUser {}
+export interface IUserMethods extends passwordManagementMethods {}
 
 type UserModel = Model<IUser, {}, IUserMethods>;
 
@@ -25,8 +29,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 	mobile: {
 		type: String,
 		match: /\d{11}/,
-		unique: true,
-		default: undefined
+		unique: true
 	},
 	password: {
 		type: String,

@@ -1,5 +1,5 @@
-import { Schema, Types, model, type Model } from 'mongoose';
-import { type ITimestampedSchema } from '../utils/schemaFactory';
+import { model, Schema, Types, type Model } from 'mongoose';
+import { type ITimestamped } from '../utils/types';
 import { type IItem } from './Item';
 
 export interface IWebsite {
@@ -12,7 +12,7 @@ export interface IFile {
 	pages?: number;
 }
 
-type AttachmentTypes = ITimestampedSchema & IWebsite & IFile;
+type AttachmentTypes = ITimestamped & IWebsite & IFile;
 
 export interface IAttachment extends AttachmentTypes {
 	parent: IItem;

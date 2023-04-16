@@ -2,6 +2,14 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Model, PopulateOptions, Query, QueryOptions, Types } from 'mongoose';
 import { isEmpty } from './basicFunctions';
 import { createError, wrapAsync } from './errorFactory';
+import {
+	CRUD,
+	CustomRequestHandler,
+	IFilterRequest,
+	IPopulateRequest,
+	IRemoveFieldsRequest,
+	IRequest
+} from './types';
 
 class QueryHandler<DocType> {
 	static readonly resCtrlKeys: string[] = [
@@ -74,33 +82,6 @@ class QueryHandler<DocType> {
 	}
 }
 
-interface IRequest extends Request {
-	user: {
-		_id: Types.ObjectId;
-	};
-	[key: string]: any;
-}
-
-interface ICreateRequest extends IRequest {
-	removeFields?: string[];
-}
-
-interface IGetRequest extends IRequest {
-	populateArray?: PopulateOptions[];
-}
-
-interface IGetAllRequest extends IGetRequest {
-	filterGetAllObject?: object;
-}
-
-type CustomRequestHandler<
-	Req = Request,
-	Res = Response,
-	Ret = Promise<void> | void
-> = (req: Req, res: Res, next: NextFunction) => Ret;
-
-type CRUD = 'bulkCreate' | 'create' | 'getAll' | 'getOne' | 'patch' | 'delete';
-
 export default class Controller<DocType extends Model<any>> {
 	private modelName: string;
 
@@ -108,6 +89,13 @@ export default class Controller<DocType extends Model<any>> {
 		this.modelName = this.model.modelName.toLowerCase();
 	}
 
+	/**
+	 * prevents the use of keys that are not valid
+	 * but doesn't guarantee the use of all the keys
+	 *
+	 * @param wantedKeys - string[]
+	 * @returns middleware
+	 */
 	preventMaliciousBody(...wantedKeys: string[]) {
 		return function (req: Request, res: Response, next: NextFunction) {
 			if (Object.keys(req.body).every(value => wantedKeys.includes(value)))
@@ -117,7 +105,11 @@ export default class Controller<DocType extends Model<any>> {
 	}
 
 	createRemoveFieldsObject(...fields: string[]) {
-		return function (req: ICreateRequest, res: Response, next: NextFunction) {
+		return function (
+			req: IRemoveFieldsRequest,
+			res: Response,
+			next: NextFunction
+		) {
 			req.removeFields = fields;
 
 			next();
@@ -125,7 +117,7 @@ export default class Controller<DocType extends Model<any>> {
 	}
 
 	createPopulateArray(...populateArray: PopulateOptions[]) {
-		return function (req: IGetRequest, res: Response, next: NextFunction) {
+		return function (req: IPopulateRequest, res: Response, next: NextFunction) {
 			req.populateArray = populateArray;
 
 			next();
@@ -172,7 +164,11 @@ export default class Controller<DocType extends Model<any>> {
 	}
 
 	static authorizeOwnership(...nestedOwnerId: string[]) {
-		return function (req: IRequest, res: Response, next: NextFunction) {
+		return function (
+			req: Required<IRequest>,
+			res: Response,
+			next: NextFunction
+		) {
 			let ownerId: any = req;
 			nestedOwnerId.forEach(key => {
 				if (ownerId[key]) ownerId = ownerId[key];
@@ -198,7 +194,7 @@ export default class Controller<DocType extends Model<any>> {
 	//#region CRUD operations:
 	@wrapAsync
 	async createOne(
-		req: ICreateRequest,
+		req: IRemoveFieldsRequest,
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
@@ -215,7 +211,7 @@ export default class Controller<DocType extends Model<any>> {
 
 	@wrapAsync
 	async getAll(
-		req: IGetAllRequest,
+		req: IFilterRequest,
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
@@ -242,7 +238,7 @@ export default class Controller<DocType extends Model<any>> {
 
 	@wrapAsync
 	async getOne(
-		req: IGetRequest,
+		req: IPopulateRequest,
 		res: Response,
 		next: NextFunction
 	): Promise<void> {
