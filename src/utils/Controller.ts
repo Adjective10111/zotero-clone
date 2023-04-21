@@ -218,7 +218,6 @@ export default class Controller<DocType extends Model<any>> {
 		const filter = req.filterGetAllObject || {};
 
 		let query = this.model.find(filter);
-		// populate if needed
 		if (req.populateArray) {
 			req.populateArray.forEach(populateOptions => {
 				query = query.populate(populateOptions);
