@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import validator from 'validator';
-import { type numericString } from './types';
+import { type NumericString } from './types';
 
 //#region user
 /**
@@ -15,8 +15,9 @@ export interface genericUser {
 	photo?: string;
 	name: string;
 	email: string;
-	mobile?: numericString | string;
+	mobile?: NumericString | string;
 	password?: string;
+	role?: string;
 
 	allowedSessionsAfter: number;
 	passwordResetToken: string;
@@ -50,6 +51,11 @@ export const genericUserSchemaDefinition = {
 		minlength: 8,
 		select: false
 	},
+	role: {
+		type: String,
+		default: 'user'
+	},
+
 	allowedSessionsAfter: Number,
 	passwordResetToken: String,
 	passwordResetExpiration: Date
@@ -57,7 +63,8 @@ export const genericUserSchemaDefinition = {
 
 export interface passwordManagementMethods {
 	checkPassword: (candidatePass: string) => Promise<boolean>;
-	allowedSession: (timestampInSeconds: number) => boolean;
+	changePassword: (newPass: string) => Promise<void>;
+	allowedSession: (timestampInSeconds?: number) => boolean;
 	createPasswordResetToken: () => Promise<string>;
 	terminateSessions: () => Promise<void>;
 }
@@ -81,10 +88,20 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 		return await bcrypt.compare(candidatePass, this.password);
 	};
 
+	schema.methods.changePassword = async function (newPass: string) {
+		// change password
+		this.password = newPass;
+		await this.save();
+		// remove password from output
+		this.password = undefined;
+	};
+
 	schema.methods.allowedSession = function (
-		timestampInSeconds: number
+		timestampInSeconds?: number
 	): boolean {
-		return this.allowedSessionsAfter < timestampInSeconds;
+		return timestampInSeconds
+			? this.allowedSessionsAfter < timestampInSeconds
+			: false;
 	};
 
 	schema.methods.createPasswordResetToken = async function (): Promise<string> {

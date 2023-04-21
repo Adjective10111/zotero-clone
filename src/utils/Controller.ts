@@ -336,12 +336,14 @@ export default class Controller<DocType extends Model<any>> {
 						data: req[`${this.modelName}s`]
 					});
 					break;
+
 				case 'create':
 					res.status(201).json({
 						status: 'success',
 						data: req[this.modelName]
 					});
 					break;
+
 				case 'getAll':
 					res.status(200).json({
 						status: 'success',
@@ -349,24 +351,24 @@ export default class Controller<DocType extends Model<any>> {
 						data: req[`${this.modelName}s`]
 					});
 					break;
+
+				case 'login':
 				case 'getOne':
-					res.status(200).json({
-						status: 'success',
-						data: req[this.modelName]
-					});
-					break;
 				case 'patch':
 					res.status(200).json({
 						status: 'success',
 						data: req[this.modelName]
 					});
 					break;
+
+				case 'logout':
 				case 'delete':
 					res.status(204).json({
 						status: 'success',
 						data: null
 					});
 					break;
+
 				default:
 					res.status(200).json({
 						data: null

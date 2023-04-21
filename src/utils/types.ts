@@ -1,9 +1,10 @@
-import { type NextFunction, type Request } from 'express';
+import { CookieOptions, type NextFunction, type Request } from 'express';
 import { Types, type HydratedDocument, type PopulateOptions } from 'mongoose';
+import { genericUser } from './schemaFactory';
 
-export type numericString = `${number}`;
+export type NumericString = `${number}`;
 
-export type Doc<T> = HydratedDocument<T>;
+export type Doc<T, TOverrides = {}> = HydratedDocument<T, TOverrides>;
 
 export type CRUD =
 	| 'bulkCreate'
@@ -11,17 +12,24 @@ export type CRUD =
 	| 'getAll'
 	| 'getOne'
 	| 'patch'
-	| 'delete';
+	| 'delete'
+	| 'login'
+	| 'logout';
+
+export type Cookie = [string, string, CookieOptions];
+
+export interface IDed {
+	id: string | Types.ObjectId;
+}
 
 export interface ITimestamped {
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-export interface IRequest extends Request {
-	user?: {
-		_id: Types.ObjectId;
-	};
+export interface IRequest<U extends genericUser = genericUser, UOverrides = {}>
+	extends Request {
+	user?: Doc<U, UOverrides>;
 	[key: string]: any;
 }
 

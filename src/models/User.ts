@@ -1,4 +1,4 @@
-import { model, Schema, type Model } from 'mongoose';
+import { Schema, model, type Model } from 'mongoose';
 import validator from 'validator';
 import {
 	genericUser,
@@ -37,6 +37,11 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		minlength: 8,
 		select: false
 	},
+	role: {
+		type: String,
+		default: 'user'
+	},
+
 	allowedSessionsAfter: Number,
 	passwordResetToken: String,
 	passwordResetExpiration: Date

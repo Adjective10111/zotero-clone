@@ -1,5 +1,5 @@
+import { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
-import {NextFunction, Request, Response} from 'express';
 
 type RequestHandler<R> = (req: any, res: Response, next: NextFunction) => R;
 
@@ -22,13 +22,25 @@ export class OperationalError extends Error {
 	}
 }
 
-export const createError = (statusCode: number, message: string): OperationalError =>
-	new OperationalError(message, statusCode);
+export const createError = (
+	statusCode: number,
+	message: string
+): OperationalError => new OperationalError(message, statusCode);
 
-export const wrapAsync = (target: any, key: string, desc: RequestHandlerDescriptor): void => {
+export const wrapAsync = (
+	target: any,
+	key: string,
+	desc: RequestHandlerDescriptor
+): void => {
 	const method = desc.value as RequestHandler<Promise<void>>;
-	
+
 	desc.value = (req: Request, res: Response, next: NextFunction) => {
 		method(req, res, next).catch(next);
-	}
-}
+	};
+};
+
+export const catchAsync =
+	(method: RequestHandler<Promise<void>>) =>
+	(req: Request, res: Response, next: NextFunction) => {
+		method(req, res, next).catch(next);
+	};
