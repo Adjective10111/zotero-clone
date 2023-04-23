@@ -9,8 +9,8 @@ import path from 'path';
 //import xss from 'xss-clean';
 
 import apiRouter from './routes/apiRouter';
+import Controller from './utils/Controller';
 import errorHandler from './utils/errorHandler';
-//import { unavailable } from './utils/handlerFactory';
 
 const app = express();
 
@@ -24,7 +24,7 @@ app
 		rateLimit({
 			max: 100,
 			windowMs: 60 * 60 * 1000,
-			message: 'Too many requests from this IP, please try again in an hour!'
+			message: 'Too many requests'
 		})
 	);
 
@@ -43,9 +43,6 @@ if (process.env.NODE_ENV === 'dev') {
 	app.use(morgan('dev'));
 }
 
-app
-	.use('/api', apiRouter)
-	//	.use('*', unavailable)
-	.use(errorHandler);
+app.use('/api', apiRouter).use('*', Controller.unavailable).use(errorHandler);
 
 export default app;

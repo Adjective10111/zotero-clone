@@ -1,8 +1,9 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Model, PopulateOptions, Query, QueryOptions, Types } from 'mongoose';
 import { isEmpty } from './basicFunctions';
-import { createError, wrapAsync } from './errorFactory';
+import { catchAsync, createError, wrapAsync } from './errorFactory';
 import {
+	BodyValidationKeys,
 	CRUD,
 	CustomRequestHandler,
 	IFilterRequest,
@@ -93,12 +94,18 @@ export default class Controller<DocType extends Model<any>> {
 	 * prevents the use of keys that are not valid
 	 * but doesn't guarantee the use of all the keys
 	 *
-	 * @param wantedKeys - string[]
+	 * @param allowed - string[]
 	 * @returns middleware
 	 */
-	preventMaliciousBody(...wantedKeys: string[]) {
+	preventMaliciousBody(bodyValidationKeys: BodyValidationKeys) {
+		let { mandatory = [], allowed = [] } = bodyValidationKeys;
+
 		return function (req: Request, res: Response, next: NextFunction) {
-			if (Object.keys(req.body).every(value => wantedKeys.includes(value)))
+			allowed = allowed.concat(mandatory);
+			if (
+				mandatory.every(value => req.body[value]) &&
+				Object.keys(req.body).every(value => allowed.includes(value))
+			)
 				next();
 			else next(createError(400, 'invalid body'));
 		};
@@ -192,141 +199,124 @@ export default class Controller<DocType extends Model<any>> {
 	}
 
 	//#region CRUD operations:
-	@wrapAsync
-	async createOne(
-		req: IRemoveFieldsRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		const document = await this.model.create(req.body);
-		if (req.removeFields) {
-			req.removeFields.forEach(field => {
-				document[field] = undefined;
-			});
-		}
-
-		req[this.modelName] = document;
-		next();
-	}
-
-	@wrapAsync
-	async getAll(
-		req: IFilterRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		const filter = req.filterGetAllObject || {};
-
-		let query = this.model.find(filter);
-		if (req.populateArray) {
-			req.populateArray.forEach(populateOptions => {
-				query = query.populate(populateOptions);
-			});
-		}
-
-		const documents = await new QueryHandler<DocType>(query, req.query)
-			.filter()
-			.sort()
-			.paginate()
-			.selectFields()
-			.exec();
-
-		req[`${this.modelName}s`] = documents;
-		next();
-	}
-
-	@wrapAsync
-	async getOne(
-		req: IPopulateRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		const id = req.params.id;
-
-		let query = this.model.findById(id);
-		// populate if needed
-		if (req.populateArray) {
-			req.populateArray.forEach(populateOptions => {
-				query = query.populate(populateOptions);
-			});
-		}
-
-		const document = await query;
-		if (!document) return next(createError(404, 'document not found'));
-
-		req[this.modelName] = document;
-		next();
-	}
-
-	@wrapAsync
-	async patchById(
-		req: IRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		if (isEmpty(req.body))
-			return next(createError(400, 'no useful body was passed'));
-
-		const document = await this.model.findByIdAndUpdate(
-			req.params.id,
-			req.body,
-			{
-				new: true,
-				runValidators: true
-			}
-		);
-		if (!document) return next(createError(404, 'document not found'));
-
-		req[this.modelName] = document;
-		next();
-	}
-
-	@wrapAsync
-	async patchDocument(
-		req: IRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		if (isEmpty(req.body))
-			return next(createError(400, 'no useful body was passed'));
-
-		Object.keys(req.body).forEach(key => {
-			req[this.modelName][key] = req.body[key];
-		});
-
-		req[this.modelName] = await req[this.modelName].save();
-		next();
-	}
-
-	@wrapAsync
-	async deleteById(
-		req: Request,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		const document = await this.model.findByIdAndDelete(req.params.id);
-		if (!document) return next(createError(404, 'document not found'));
-
-		next();
-	}
-
-	@wrapAsync
-	async deleteDocument(
-		req: IRequest,
-		res: Response,
-		next: NextFunction
-	): Promise<void> {
-		await req[this.modelName].deleteOne();
-		next();
-	}
-
-	sendCRUDOperation(this: Controller<DocType>, operation: CRUD) {
-		return function (
-			this: Controller<DocType>,
-			req: IRequest,
+	createOne = catchAsync(
+		async (
+			req: IRemoveFieldsRequest,
 			res: Response,
 			next: NextFunction
-		) {
+		): Promise<void> => {
+			const document = await this.model.create(req.body);
+			if (req.removeFields) {
+				req.removeFields.forEach(field => {
+					document[field] = undefined;
+				});
+			}
+
+			req[this.modelName] = document;
+			next();
+		}
+	);
+
+	getAll = catchAsync(
+		async (
+			req: IFilterRequest,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			const filter = req.filterGetAllObject || {};
+
+			let query = this.model.find(filter);
+			if (req.populateArray) {
+				req.populateArray.forEach(populateOptions => {
+					query = query.populate(populateOptions);
+				});
+			}
+
+			const documents = await new QueryHandler<DocType>(query, req.query)
+				.filter()
+				.sort()
+				.paginate()
+				.selectFields()
+				.exec();
+
+			req[`${this.modelName}s`] = documents;
+			next();
+		}
+	);
+	getOne = catchAsync(
+		async (
+			req: IPopulateRequest,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			const id = req.params.id;
+
+			let query = this.model.findById(id);
+			// populate if needed
+			if (req.populateArray) {
+				req.populateArray.forEach(populateOptions => {
+					query = query.populate(populateOptions);
+				});
+			}
+
+			const document = await query;
+			if (!document) return next(createError(404, 'document not found'));
+
+			req[this.modelName] = document;
+			next();
+		}
+	);
+
+	patchById = catchAsync(
+		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
+			if (isEmpty(req.body))
+				return next(createError(400, 'no useful body was passed'));
+
+			const document = await this.model.findByIdAndUpdate(
+				req.params.id,
+				req.body,
+				{
+					new: true,
+					runValidators: true
+				}
+			);
+			if (!document) return next(createError(404, 'document not found'));
+
+			req[this.modelName] = document;
+			next();
+		}
+	);
+	patchDocument = catchAsync(
+		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
+			if (isEmpty(req.body))
+				return next(createError(400, 'no useful body was passed'));
+
+			Object.keys(req.body).forEach(key => {
+				req[this.modelName][key] = req.body[key];
+			});
+
+			req[this.modelName] = await req[this.modelName].save();
+			next();
+		}
+	);
+
+	deleteById = catchAsync(
+		async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+			const document = await this.model.findByIdAndDelete(req.params.id);
+			if (!document) return next(createError(404, 'document not found'));
+
+			next();
+		}
+	);
+	deleteDocument = catchAsync(
+		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
+			await req[this.modelName].deleteOne();
+			next();
+		}
+	);
+
+	sendResponse = (operation: CRUD) => {
+		return (req: IRequest, res: Response, next: NextFunction) => {
 			switch (operation) {
 				case 'bulkCreate':
 					res.status(201).json({
@@ -374,6 +364,6 @@ export default class Controller<DocType extends Model<any>> {
 					});
 			}
 		};
-	}
+	};
 	//#endregion
 }

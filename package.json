@@ -51,5 +51,8 @@
     "eslint-plugin-prettier": "*",
     "prettier": "*",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": "^16"
   }
 }

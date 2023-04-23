@@ -42,9 +42,15 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		default: 'user'
 	},
 
-	allowedSessionsAfter: Number,
-	passwordResetToken: String,
-	passwordResetExpiration: Date
+	passwordResetToken: {
+		type: String,
+		select: false
+	},
+	passwordResetExpiration: {
+		type: Date,
+		select: false
+	},
+	allowedSessionsAfter: Number
 });
 
 passwordManagement(userSchema);

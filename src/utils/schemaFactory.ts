@@ -56,9 +56,15 @@ export const genericUserSchemaDefinition = {
 		default: 'user'
 	},
 
-	allowedSessionsAfter: Number,
-	passwordResetToken: String,
-	passwordResetExpiration: Date
+	passwordResetToken: {
+		type: String,
+		select: false
+	},
+	passwordResetExpiration: {
+		type: Date,
+		select: false
+	},
+	allowedSessionsAfter: Number
 };
 
 export interface passwordManagementMethods {
@@ -85,6 +91,7 @@ export const passwordManagement = (schema: mongoose.Schema): void => {
 	schema.methods.checkPassword = async function (
 		candidatePass: string
 	): Promise<boolean> {
+		if (!this.password) return false;
 		return await bcrypt.compare(candidatePass, this.password);
 	};
 

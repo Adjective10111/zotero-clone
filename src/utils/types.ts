@@ -1,8 +1,23 @@
-import { CookieOptions, type NextFunction, type Request } from 'express';
+import {
+	type CookieOptions,
+	type NextFunction,
+	type Request,
+	type RequestHandler
+} from 'express';
 import { Types, type HydratedDocument, type PopulateOptions } from 'mongoose';
-import { genericUser } from './schemaFactory';
+import { type genericUser } from './schemaFactory';
 
 export type NumericString = `${number}`;
+
+export type Decorator = (
+	target: any,
+	key: string,
+	desc: PropertyDescriptor
+) => void;
+
+export interface RouteHandlerDescriptor extends PropertyDescriptor {
+	value?: RequestHandler;
+}
 
 export type Doc<T, TOverrides = {}> = HydratedDocument<T, TOverrides>;
 
@@ -17,6 +32,11 @@ export type CRUD =
 	| 'logout';
 
 export type Cookie = [string, string, CookieOptions];
+
+export interface BodyValidationKeys {
+	mandatory?: string[];
+	allowed?: string[];
+}
 
 export interface IDed {
 	id: string | Types.ObjectId;
