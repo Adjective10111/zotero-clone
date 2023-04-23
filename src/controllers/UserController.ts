@@ -62,11 +62,14 @@ export default class UserController extends Controller<typeof User> {
 		super(User);
 	}
 
-	caughtAuthenticate = Authenticator.caughtAuthenticate(
+	static caughtAuthenticate = Authenticator.caughtAuthenticate(
 		User,
 		UserController.userCookie
 	);
-	authenticate = Authenticator.authenticate(User, UserController.userCookie);
+	static authenticate = Authenticator.authenticate(
+		User,
+		UserController.userCookie
+	);
 
 	validateRoleValue(req: URequest, res: Response, next: NextFunction) {
 		if (req.body?.role === 'admin')
