@@ -2,8 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { join } from 'path';
 import 'reflect-metadata';
 import { getMethod, getMiddlewares, getOperation, getPath } from '.';
-import SingletonRouter from '../singletonRouter';
-import { CRUD } from '../types';
+import SingletonRouter from './SingletonRouter';
 
 const emptyHandler = (req: Request, res: Response, next: NextFunction) =>
 	next();
