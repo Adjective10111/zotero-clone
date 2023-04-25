@@ -12,7 +12,6 @@ export function RouteHandler(routePrefix: string) {
 		const router = SingletonRouter.getInstance();
 		const prototype = target.prototype;
 
-		console.log(target.prototype);
 		for (let key in prototype) {
 			const routeHandler = prototype[key];
 			const path = getPath(prototype, key);
