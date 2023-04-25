@@ -1,14 +1,16 @@
 import { model, Schema, Types, type FilterQuery, type Model } from 'mongoose';
-import { type Doc } from '../utils/types';
+import { isEmpty } from '../utils/basicFunctions';
+import { ITimestamped, type Doc } from '../utils/types';
 import Item, { type IItem } from './Item';
 import { type ILibrary } from './Library';
 import { type INote } from './Note';
 
-interface IStdCollection {
+const collectionTypes = ['SearchingCollection', 'Collection'];
+interface IStdCollection extends ITimestamped {
 	name: string;
-	parent: ILibrary;
+	parent: Doc<ILibrary>;
 
-	items?: IItem[];
+	items?: Doc<IItem>[];
 }
 
 export interface ISearchingCollection extends IStdCollection {
@@ -23,17 +25,30 @@ export interface ICollection extends IStdCollection {
 
 export type AnyCollection = ICollection | ISearchingCollection;
 
-interface CollectionModel extends Model<AnyCollection> {
+interface CollectionMethods {
+	empty(this: Doc<ICollection>): Promise<void>;
+	searchItems(this: Doc<ISearchingCollection>): Promise<void>;
+}
+
+interface CollectionModel extends Model<AnyCollection, {}, CollectionMethods> {
 	isSearchingCollection(
 		doc: Doc<AnyCollection>
 	): doc is Doc<ISearchingCollection>;
-
-	searchItems(
-		doc: Doc<ISearchingCollection>
-	): Promise<Doc<ISearchingCollection>>;
+	isCollection(doc: Doc<AnyCollection>): doc is Doc<ICollection>;
 }
 
-const collectionSchema = new Schema<AnyCollection, CollectionModel>(
+export type AnyCollectionDoc = Doc<AnyCollection, CollectionMethods>;
+export type SearchingCollectionDoc = Doc<
+	ISearchingCollection,
+	CollectionMethods
+>;
+export type CollectionDoc = Doc<ICollection, CollectionMethods>;
+
+const collectionSchema = new Schema<
+	AnyCollection,
+	CollectionModel,
+	CollectionMethods
+>(
 	{
 		name: {
 			type: String,
@@ -47,11 +62,28 @@ const collectionSchema = new Schema<AnyCollection, CollectionModel>(
 
 		type: {
 			type: String,
-			required: [true, 'for better performance include the type']
+			required: [true, 'for better performance include the type'],
+			validate: {
+				validator: function (value: string): boolean {
+					return collectionTypes.includes(value);
+				},
+				message: `type must be either "${collectionTypes.join('" or "')}"`
+			}
 		},
-		searchQuery: Object
+		searchQuery: {
+			type: Object,
+			validate: {
+				validator: function (this: AnyCollection, value: Object): boolean {
+					let validation = isEmpty(value);
+					if (this.type === 'SearchingCollection') validation = !validation;
+					return validation;
+				},
+				message: 'searchQuery must be specified in a SearchingCollection'
+			}
+		}
 	},
 	{
+		timestamps: true,
 		toJSON: {
 			virtuals: true
 		}
@@ -72,17 +104,27 @@ collectionSchema.virtual('notes', {
 	localField: '_id'
 });
 
+collectionSchema.methods.searchItems = async function (
+	this: Doc<ISearchingCollection>
+): Promise<void> {
+	this.items = await Item.find(this.searchQuery).exec();
+};
+collectionSchema.methods.empty = async function (
+	this: Doc<ICollection>
+): Promise<void> {
+	await this.populate('items');
+	this.items?.forEach(async item => await item.deleteOne().exec());
+};
+
 collectionSchema.statics.isSearchingCollection = function (
 	doc: Doc<AnyCollection>
 ): doc is Doc<ISearchingCollection> {
 	return doc.type === 'SearchingCollection';
 };
-
-collectionSchema.statics.searchItems = async function (
-	doc: Doc<ISearchingCollection>
-): Promise<Doc<ISearchingCollection>> {
-	doc.items = await Item.find(doc.searchQuery);
-	return doc;
+collectionSchema.statics.isCollection = function (
+	doc: Doc<AnyCollection>
+): doc is Doc<ICollection> {
+	return doc.type === 'Collection';
 };
 
 const Collection = model<AnyCollection, CollectionModel>(

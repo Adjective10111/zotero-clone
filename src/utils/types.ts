@@ -62,7 +62,7 @@ export interface IPopulateRequest extends IRequest {
 }
 
 export interface IFilterRequest extends IPopulateRequest {
-	filterGetAllObject?: object;
+	defaultFilter?: object;
 }
 
 export type CustomRequestHandler<

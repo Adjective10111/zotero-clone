@@ -1,18 +1,29 @@
-import { Schema, Types, model } from 'mongoose';
-import { type ICollection } from './Collection';
+import { Model, model, Query, Schema, Types } from 'mongoose';
+import { Doc } from '../utils/types';
+import Collection, { ICollection, type AnyCollectionDoc } from './Collection';
 import { type IUser } from './User';
 
+const defaultCollectionNames = ['unfiled items', 'duplicates', 'bin'];
+
 export interface ILibrary {
-	user: IUser;
+	user: Doc<IUser>;
 
 	name: string;
-	collections?: ICollection[];
-	duplicates: ICollection;
-	unfiledItems: ICollection;
-	bin: ICollection;
+	collections?: AnyCollectionDoc[];
+	duplicates: AnyCollectionDoc;
+	unfiledItems: AnyCollectionDoc;
+	bin: AnyCollectionDoc;
 }
 
-const librarySchema = new Schema<ILibrary>(
+interface ILibraryMethods {
+	initialize(this: Doc<ILibrary>): Promise<void>;
+	emptyBin(this: Doc<ILibrary>): Promise<void>;
+	removeDuplicateCollections(this: Doc<ILibrary>): void;
+}
+
+type LibraryModel = Model<ILibrary, {}, ILibraryMethods>;
+
+const librarySchema = new Schema<ILibrary, LibraryModel, ILibraryMethods>(
 	{
 		user: {
 			type: Types.ObjectId,
@@ -38,6 +49,7 @@ const librarySchema = new Schema<ILibrary>(
 		}
 	},
 	{
+		timestamps: true,
 		toJSON: {
 			virtuals: true
 		}
@@ -52,5 +64,48 @@ librarySchema.virtual('collections', {
 	localField: '_id'
 });
 
-const Library = model<ILibrary>('Library', librarySchema);
+librarySchema.methods.initialize = async function (): Promise<void> {
+	const unfiledItems = await Collection.create({
+		parent: this.id,
+		name: 'unfiled items',
+		type: 'Collection'
+	});
+	const duplicates = await Collection.create({
+		parent: this.id,
+		name: 'duplicates',
+		type: 'SearchingCollection',
+		searchQuery: {
+			parent: this.id,
+			$where: 'this.collections.length > 1'
+		}
+	});
+	const bin = await Collection.create({
+		parent: this.id,
+		name: 'bin',
+		type: 'Collection'
+	});
+
+	this.unfiledItems = unfiledItems.id;
+	this.duplicates = duplicates.id;
+	this.bin = bin.id;
+
+	await this.save();
+};
+librarySchema.methods.emptyBin = async function (): Promise<void> {
+	await (this.bin as ).empty();
+};
+librarySchema.methods.removeDuplicateCollections = function (): void {
+	if (!this.populated('collections'))
+		throw EvalError('collections are not populated');
+
+	defaultCollectionNames.forEach(name => {
+		let index = this.collections?.findIndex(doc => doc.name === name);
+		if (index === undefined || index === -1) return;
+		this.collections?.splice(index, 1);
+	});
+};
+
+librarySchema.queue('initialize', []);
+
+const Library = model<ILibrary, LibraryModel>('Library', librarySchema);
 export default Library;

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import validator from 'validator';
 import { type NumericString } from './types';
 
@@ -75,7 +75,7 @@ export interface passwordManagementMethods {
 	terminateSessions: () => Promise<void>;
 }
 
-export const passwordManagement = (schema: mongoose.Schema): void => {
+export const passwordManagement = (schema: Schema): void => {
 	// control password changes
 	schema.pre('save', async function (next) {
 		if (!this.isModified('password')) return next();
@@ -203,7 +203,7 @@ export const genericProductSchemaDefinition = {
  * calls the priceChange method every time it's got a discount or price change
  * @param {mongoose.Schema} schema
  */
-export const discountManagement = (schema: mongoose.Schema) => {
+export const discountManagement = (schema: Schema) => {
 	schema.post('save', function (doc) {
 		if (
 			doc.isModified('discount') ||

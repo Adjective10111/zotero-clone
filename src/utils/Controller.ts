@@ -84,7 +84,7 @@ class QueryHandler<DocType> {
 }
 
 export default class Controller<DocType extends Model<any>> {
-	private modelName: string;
+	modelName: string;
 
 	constructor(public model: Model<any>) {
 		this.modelName = this.model.modelName.toLowerCase();
@@ -108,6 +108,16 @@ export default class Controller<DocType extends Model<any>> {
 			)
 				next();
 			else next(createError(400, 'invalid body'));
+		};
+	}
+
+	filterByOwner(ownerKey: string) {
+		return function (req: IFilterRequest, res: Response, next: NextFunction) {
+			req.defaultFilter = {
+				...(req.defaultFilter || {}),
+				[ownerKey]: req.user?._id
+			};
+			next();
 		};
 	}
 
@@ -144,6 +154,7 @@ export default class Controller<DocType extends Model<any>> {
 			next();
 		};
 	}
+	addUserIdToBody = this.moveReqKeyToBody('user', 'user', '_id');
 
 	static unavailable(req: Request, res: Response, next: NextFunction) {
 		next(createError(404, 'Page Not Found'));
@@ -152,7 +163,7 @@ export default class Controller<DocType extends Model<any>> {
 		next(createError(403, 'Unauthorized Access'));
 	}
 
-	static conditionalMiddleware(
+	conditionalMiddleware(
 		middleware: RequestHandler,
 		negated: boolean,
 		...conditions: CustomRequestHandler<Request, Response, boolean>[]
@@ -170,7 +181,7 @@ export default class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	static authorizeOwnership(...nestedOwnerId: string[]) {
+	authorizeOwnership(...nestedOwnerId: string[]) {
 		return function (
 			req: Required<IRequest>,
 			res: Response,
@@ -188,7 +199,7 @@ export default class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	static isChildRouter(parentParam: string) {
+	isChildRouter(parentParam: string) {
 		return function (
 			req: IRequest,
 			res: Response,
@@ -223,7 +234,7 @@ export default class Controller<DocType extends Model<any>> {
 			res: Response,
 			next: NextFunction
 		): Promise<void> => {
-			const filter = req.filterGetAllObject || {};
+			const filter = req.defaultFilter || {};
 
 			let query = this.model.find(filter);
 			if (req.populateArray) {
@@ -259,7 +270,7 @@ export default class Controller<DocType extends Model<any>> {
 				});
 			}
 
-			const document = await query;
+			const document = await query.exec();
 			if (!document) return next(createError(404, 'document not found'));
 
 			req[this.modelName] = document;
@@ -272,14 +283,12 @@ export default class Controller<DocType extends Model<any>> {
 			if (isEmpty(req.body))
 				return next(createError(400, 'no useful body was passed'));
 
-			const document = await this.model.findByIdAndUpdate(
-				req.params.id,
-				req.body,
-				{
+			const document = await this.model
+				.findByIdAndUpdate(req.params.id, req.body, {
 					new: true,
 					runValidators: true
-				}
-			);
+				})
+				.exec();
 			if (!document) return next(createError(404, 'document not found'));
 
 			req[this.modelName] = document;
@@ -302,7 +311,7 @@ export default class Controller<DocType extends Model<any>> {
 
 	deleteById = catchAsync(
 		async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-			const document = await this.model.findByIdAndDelete(req.params.id);
+			const document = await this.model.findByIdAndDelete(req.params.id).exec();
 			if (!document) return next(createError(404, 'document not found'));
 
 			next();
@@ -310,7 +319,7 @@ export default class Controller<DocType extends Model<any>> {
 	);
 	deleteDocument = catchAsync(
 		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
-			await req[this.modelName].deleteOne();
+			await req[this.modelName].deleteOne().exec();
 			next();
 		}
 	);

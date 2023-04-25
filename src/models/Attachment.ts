@@ -2,30 +2,32 @@ import { model, Schema, Types, type Model } from 'mongoose';
 import { type ITimestamped } from '../utils/types';
 import { type IItem } from './Item';
 
-export interface IWebsite {
+interface IAttachment {
+	parent: IItem;
+}
+
+export interface IWebsite extends IAttachment {
+	type: 'website';
 	html?: string;
 	url?: string;
 }
 
-export interface IFile {
+export interface IFile extends IAttachment {
+	type: 'file';
 	filename: string;
 	pages?: number;
 }
 
-type AttachmentTypes = ITimestamped & IWebsite & IFile;
-
-export interface IAttachment extends AttachmentTypes {
-	parent: IItem;
-}
+export type AnyAttachment = ITimestamped & (IWebsite | IFile);
 
 interface IAttachmentsMethods {
 	populateReference(): Promise<void>;
 }
 
-type AttachmentModel = Model<IAttachment, {}, IAttachmentsMethods>;
+type AttachmentModel = Model<AnyAttachment, {}, IAttachmentsMethods>;
 
 const attachmentSchema = new Schema<
-	IAttachment,
+	AnyAttachment,
 	AttachmentModel,
 	IAttachmentsMethods
 >(
@@ -33,6 +35,10 @@ const attachmentSchema = new Schema<
 		parent: {
 			type: Types.ObjectId,
 			required: [true, 'should be attachment']
+		},
+		type: {
+			type: String,
+			required: [true, 'the type should be known']
 		},
 		// website
 		html: String,
@@ -48,7 +54,7 @@ const attachmentSchema = new Schema<
 
 attachmentSchema.index({ parent: 1 });
 
-const Attachment = model<IAttachment, AttachmentModel>(
+const Attachment = model<AnyAttachment, AttachmentModel>(
 	'Attachment',
 	attachmentSchema
 );

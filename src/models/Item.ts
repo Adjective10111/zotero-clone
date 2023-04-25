@@ -1,7 +1,9 @@
 import { model, Schema, Types, type Model } from 'mongoose';
+import { isEmpty } from '../utils/basicFunctions';
 import { type Doc, type ITimestamped } from '../utils/types';
-import { type IAttachment } from './Attachment';
+import { type AnyAttachment } from './Attachment';
 import { type ICollection } from './Collection';
+import { type ILibrary } from './Library';
 import { type INote } from './Note';
 
 interface ITag {
@@ -10,14 +12,15 @@ interface ITag {
 }
 
 export interface IItem extends ITimestamped {
-	parent: ICollection;
+	parent: Doc<ILibrary>;
+	collections: Doc<ICollection>[] | Types.ObjectId[];
 
 	name: string;
-	primaryAttachment: IAttachment;
+	primaryAttachment: AnyAttachment;
 	itemType: string;
 	metadata?: object;
 
-	attachments?: IAttachment[];
+	attachments?: AnyAttachment[];
 	notes?: INote[];
 
 	related: ({ name: string; item: IItem } | IItem)[];
@@ -34,9 +37,14 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 	{
 		parent: {
 			type: Types.ObjectId,
-			ref: 'Collection',
-			required: [true, 'must belong to a Collection']
+			ref: 'Library',
+			required: [true, 'must belong to a Library']
 		},
+		collections: {
+			type: [{ type: Types.ObjectId, ref: 'Collection' }],
+			default: []
+		},
+
 		name: {
 			type: String,
 			required: [true, 'must be named']
@@ -113,6 +121,25 @@ itemSchema.methods.relate = async function (
 	await doc.save();
 	await this.save();
 };
+
+itemSchema.pre('save', function (next) {
+	if (this.isNew) this.itemType = this.primaryAttachment.type;
+	next();
+});
+itemSchema.pre('save', function (next) {
+	if (this.isModified('collections')) {
+		if (this.collections.length === 0)
+			this.collections = [
+				this.parent.unfiledItems._id
+			] as typeof this.collections;
+		else if (this.collections.length > 1) {
+			const index = this.collections.indexOf(this.parent.unfiledItems.id);
+			if (index !== -1) this.collections.splice(index, 1);
+		}
+	}
+
+	next();
+});
 
 const Item = model<IItem, ItemModel>('Item', itemSchema);
 export default Item;
