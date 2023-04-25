@@ -1,6 +1,10 @@
 import { Model, model, Query, Schema, Types } from 'mongoose';
 import { Doc } from '../utils/types';
-import Collection, { ICollection, type AnyCollectionDoc } from './Collection';
+import Collection, {
+	CollectionDoc,
+	ICollection,
+	type AnyCollectionDoc
+} from './Collection';
 import { type IUser } from './User';
 
 const defaultCollectionNames = ['unfiled items', 'duplicates', 'bin'];
@@ -92,7 +96,7 @@ librarySchema.methods.initialize = async function (): Promise<void> {
 	await this.save();
 };
 librarySchema.methods.emptyBin = async function (): Promise<void> {
-	await (this.bin as ).empty();
+	await (this.bin as CollectionDoc).empty();
 };
 librarySchema.methods.removeDuplicateCollections = function (): void {
 	if (!this.populated('collections'))
