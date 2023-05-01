@@ -23,7 +23,6 @@ router
 		controller.sendResponse('getAll')
 	)
 	.post(
-		controller.addUserIdToBody,
 		controller.validateBody.create,
 		controller.createOne,
 		controller.sendResponse('create')
@@ -33,13 +32,13 @@ router
 	.get(
 		controller.queuePopulateField.collections,
 		controller.getOne,
-		controller.authorizeOwnership,
+		controller.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.validateBody.patch,
 		controller.getOne,
-		controller.authorizeOwnership,
+		controller.authorizeEdit,
 		controller.patchDocument,
 		controller.sendResponse('patch')
 	)

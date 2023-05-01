@@ -1,6 +1,6 @@
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
@@ -43,6 +43,20 @@ if (process.env.NODE_ENV === 'dev') {
 	app.use(morgan('dev'));
 }
 
-app.use('/api', apiRouter).use('*', Controller.unavailable).use(errorHandler);
+app
+	.use('/api', apiRouter)
+	.use(
+		'*',
+		function (req: Request, res: Response, next: NextFunction) {
+			// todo fix this weird bug
+			if (res.headersSent) {
+				console.log(req.url);
+				console.log(req.body);
+				console.log(req.params);
+			} else next();
+		},
+		Controller.unavailable
+	)
+	.use(errorHandler);
 
 export default app;

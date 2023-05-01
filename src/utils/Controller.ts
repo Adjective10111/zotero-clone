@@ -1,7 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import { Model, PopulateOptions, Query, QueryOptions, Types } from 'mongoose';
+import { Model, PopulateOptions, Query, QueryOptions } from 'mongoose';
 import { isEmpty } from './basicFunctions';
-import { catchAsync, createError, wrapAsync } from './errorFactory';
+import { catchAsync, createError } from './errorFactory';
 import {
 	BodyValidationKeys,
 	CRUD,
@@ -79,15 +79,24 @@ class QueryHandler<DocType> {
 	}
 
 	async exec(): Promise<DocType[]> {
-		return this.query.exec();
+		return await this.query.exec();
 	}
 }
 
-export default class Controller<DocType extends Model<any>> {
+export default abstract class Controller<DocType extends Model<any>> {
 	modelName: string;
 
 	constructor(public model: Model<any>) {
 		this.modelName = this.model.modelName.toLowerCase();
+	}
+
+	debugLog(req: IRequest, res: Response, next: NextFunction) {
+		console.log(
+			`${Date.now()} - ParamKeys: ${Object.keys(req.params)} - ${
+				req.user
+			} - BodyKeys: ${Object.keys(req.body)}`
+		);
+		next();
 	}
 
 	/**
@@ -111,12 +120,13 @@ export default class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	filterByOwner(ownerKey: string) {
+	filterByOwnerFactory(ownerKey: string) {
 		return function (req: IFilterRequest, res: Response, next: NextFunction) {
 			req.defaultFilter = {
 				...(req.defaultFilter || {}),
 				[ownerKey]: req.user?._id
 			};
+
 			next();
 		};
 	}
@@ -154,7 +164,8 @@ export default class Controller<DocType extends Model<any>> {
 			next();
 		};
 	}
-	addUserIdToBody = this.moveReqKeyToBody('user', 'user', '_id');
+	addUserIdToBody = (bodyKey = 'user') =>
+		this.moveReqKeyToBody(bodyKey, 'user', '_id');
 
 	static unavailable(req: Request, res: Response, next: NextFunction) {
 		next(createError(404, 'Page Not Found'));
@@ -181,19 +192,15 @@ export default class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	authorizeOwnership(...nestedOwnerId: string[]) {
-		return function (
-			req: Required<IRequest>,
-			res: Response,
-			next: NextFunction
-		) {
+	authorizeOwnershipFactory(...nestedOwnerId: string[]) {
+		return function (req: IRequest, res: Response, next: NextFunction) {
 			let ownerId: any = req;
 			nestedOwnerId.forEach(key => {
 				if (ownerId[key]) ownerId = ownerId[key];
 				else
 					next(createError(400, `missing item from request: ${nestedOwnerId}`));
 			});
-			if (ownerId !== req.user._id)
+			if (!req.user?._id.equals(ownerId))
 				next(createError(403, 'not the owner of document'));
 			else next();
 		};
@@ -303,8 +310,8 @@ export default class Controller<DocType extends Model<any>> {
 			Object.keys(req.body).forEach(key => {
 				req[this.modelName][key] = req.body[key];
 			});
-
 			req[this.modelName] = await req[this.modelName].save();
+
 			next();
 		}
 	);
@@ -319,7 +326,7 @@ export default class Controller<DocType extends Model<any>> {
 	);
 	deleteDocument = catchAsync(
 		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
-			await req[this.modelName].deleteOne().exec();
+			await req[this.modelName].deleteOne();
 			next();
 		}
 	);

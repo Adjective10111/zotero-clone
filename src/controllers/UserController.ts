@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import { NextFunction, Response } from 'express';
-import User, { IUser, IUserMethods } from '../models/User';
+import User, { UserDoc } from '../models/User';
 import Authenticator from '../utils/Authenticator';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { Doc, type IRequest } from '../utils/types';
 
-type URequest = IRequest<IUser, IUserMethods>;
+type URequest = IRequest<UserDoc>;
 
 interface ILogin extends URequest {
 	body: {
@@ -140,7 +140,7 @@ export default class UserController extends Controller<typeof User> {
 		req.user = (await User.findOne({
 			passwordResetToken: hashedToken,
 			passwordResetExpiration: { $gt: Date.now() }
-		})) as Doc<IUser, IUserMethods>;
+		})) as UserDoc;
 		if (!req.user)
 			return next(createError(400, 'token is invalid or has expired'));
 

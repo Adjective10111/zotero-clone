@@ -1,14 +1,14 @@
-import { model, Schema, Types, type FilterQuery, type Model } from 'mongoose';
+import { Schema, Types, model, type FilterQuery, type Model } from 'mongoose';
 import { isEmpty } from '../utils/basicFunctions';
 import { ITimestamped, type Doc } from '../utils/types';
 import Item, { type IItem } from './Item';
-import { type ILibrary } from './Library';
+import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
 
 const collectionTypes = ['SearchingCollection', 'Collection'];
 interface IStdCollection extends ITimestamped {
 	name: string;
-	parent: Doc<ILibrary>;
+	parent: LibraryDoc;
 
 	items?: Doc<IItem>[];
 }

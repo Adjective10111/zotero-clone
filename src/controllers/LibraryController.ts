@@ -1,12 +1,13 @@
 import { NextFunction, Response } from 'express';
 import Collection from '../models/Collection';
-import Library, { type ILibrary } from '../models/Library';
+import Group from '../models/Group';
+import Library, { type LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
-import { wrapAsync } from '../utils/errorFactory';
-import { Doc, IFilterRequest, IRequest } from '../utils/types';
+import { createError, wrapAsync } from '../utils/errorFactory';
+import { IFilterRequest, IRequest } from '../utils/types';
 
 interface ILRequest extends IRequest {
-	library?: Doc<ILibrary>;
+	library?: LibraryDoc;
 }
 
 export class LibraryController extends Controller<typeof Library> {
@@ -35,11 +36,20 @@ export class LibraryController extends Controller<typeof Library> {
 	};
 
 	bodyKeys = {
-		create: { mandatory: ['user', 'name'] },
-		patch: { allowed: ['name'] }
+		create: { allowed: ['owner', 'group', 'private'], mandatory: ['name'] },
+		patch: { allowed: ['name', 'group', 'private'] }
 	};
 	validateBody = {
-		create: this.preventMaliciousBody(this.bodyKeys.create),
+		create: async (req: IRequest, res: Response, next: NextFunction) => {
+			this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
+			if (req.body.group) {
+				if (req.body.owner) return next(createError(400, 'invalid body'));
+				const group = await Group.findById(req.body.group);
+				if (!group) return next(createError(400, 'invalid group'));
+				req.body.owner = group.owner;
+			} else if (!req.body.owner) return next(createError(400, 'invalid body'));
+			next();
+		},
 		patch: this.preventMaliciousBody(this.bodyKeys.patch)
 	};
 
@@ -55,9 +65,17 @@ export class LibraryController extends Controller<typeof Library> {
 		next();
 	}
 
-	authorizeOwnership = () => {
-		return super.authorizeOwnership(this.modelName, '_id');
-	};
+	filterByOwner = super.filterByOwnerFactory('owner');
+
+	authorizeOwnership = super.authorizeOwnershipFactory(this.modelName, 'owner');
+	async authorizeView(req: ILRequest, res: Response, next: NextFunction) {
+		if (await req.library?.canView(req.user?.id)) next();
+		else next(createError(403, 'unauthorized'));
+	}
+	async authorizeEdit(req: ILRequest, res: Response, next: NextFunction) {
+		if (await req.library?.canEdit(req.user?.id)) next();
+		else next(createError(403, 'unauthorized'));
+	}
 
 	@wrapAsync
 	async deleteCollections(req: ILRequest, res: Response, next: NextFunction) {

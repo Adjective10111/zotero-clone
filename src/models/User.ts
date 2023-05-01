@@ -5,9 +5,11 @@ import {
 	passwordManagement,
 	type passwordManagementMethods
 } from '../utils/schemaFactory';
+import { Doc } from '../utils/types';
 
-export interface IUser extends genericUser {}
-export interface IUserMethods extends passwordManagementMethods {}
+interface IUser extends genericUser {}
+interface IUserMethods extends passwordManagementMethods {}
+export type UserDoc = Doc<IUser, IUserMethods>;
 
 type UserModel = Model<IUser, {}, IUserMethods>;
 
@@ -25,11 +27,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		unique: true,
 		required: [true, 'user must have an email'],
 		validate: [validator.isEmail, 'Please provide a valid email']
-	},
-	mobile: {
-		type: String,
-		match: /\d{11}/,
-		unique: true
 	},
 	password: {
 		type: String,

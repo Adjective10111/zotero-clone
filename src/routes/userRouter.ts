@@ -34,7 +34,7 @@ router.patch(
 	controller.sendResponse('patch')
 );
 
-router.use(controller.authenticate);
+router.use(UserController.authenticate);
 
 router.route('/me').get(controller.sendResponse('getOne')).patch(
 	// uploadProfile,

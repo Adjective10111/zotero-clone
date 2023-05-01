@@ -20,3 +20,7 @@ The list of the features is as follows:
 - Collaboration
 - Advanced search with text-based searching capability
 - bibliography and citation creation
+
+## Session todo
+
+- tag performance

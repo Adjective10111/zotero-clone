@@ -15,7 +15,7 @@ export interface genericUser {
 	photo?: string;
 	name: string;
 	email: string;
-	mobile?: NumericString | string;
+	// mobile?: NumericString | string;
 	password?: string;
 	role?: string;
 

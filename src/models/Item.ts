@@ -1,9 +1,8 @@
-import { model, Schema, Types, type Model } from 'mongoose';
-import { isEmpty } from '../utils/basicFunctions';
+import { Schema, Types, model, type Model } from 'mongoose';
 import { type Doc, type ITimestamped } from '../utils/types';
 import { type AnyAttachment } from './Attachment';
 import { type ICollection } from './Collection';
-import { type ILibrary } from './Library';
+import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
 
 interface ITag {
@@ -12,7 +11,7 @@ interface ITag {
 }
 
 export interface IItem extends ITimestamped {
-	parent: Doc<ILibrary>;
+	parent: LibraryDoc;
 	collections: Doc<ICollection>[] | Types.ObjectId[];
 
 	name: string;

@@ -1,18 +1,18 @@
-import { model, Schema, Types, type Model } from 'mongoose';
+import { Schema, Types, model, type Model } from 'mongoose';
 import { type ITimestamped } from '../utils/types';
 import { type ICollection } from './Collection';
 import { type IItem } from './Item';
-import { type ILibrary } from './Library';
+import { type LibraryDoc } from './Library';
 
 type ParentModelName = 'item' | 'collection' | 'library';
 
 export interface INote extends ITimestamped {
-	parent: IItem | ICollection | ILibrary;
+	parent: IItem | ICollection | LibraryDoc;
 	parentModel: ParentModelName;
 
 	item?: IItem;
 	collection?: ICollection;
-	library?: ILibrary;
+	library?: LibraryDoc;
 
 	text: string;
 }

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import UserController from '../controllers/UserController';
 import attachmentRouter from './attachmentRouter';
 import collectionRouter from './collectionRouter';
+import groupRouter from './groupRouter';
 import itemRouter from './itemRouter';
 import libraryRouter from './libraryRouter';
 import noteRouter from './noteRouter';
@@ -12,6 +13,7 @@ const router = Router();
 router.use('/users', userRouter);
 
 router.use(UserController.authenticate);
+router.use('/groups', groupRouter);
 router.use('/libraries', libraryRouter);
 router.use('/collections', collectionRouter);
 router.use('/items', itemRouter);
