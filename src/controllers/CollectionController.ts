@@ -39,26 +39,30 @@ export class CollectionController extends Controller<typeof Collection> {
 		create: catchAsync(
 			async (req: IRequest, res: Response, next: NextFunction) => {
 				if (!req.body.type) req.body.type = collectionTypes.collection;
-				this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
+				this.preventMaliciousBody(this.bodyKeys.create)(req, res, err => {
+					if (err) return next(err);
 
-				if (
-					req.body.type === collectionTypes.searchingCollection &&
-					!req.body.searchQuery
-				)
-					next(createError(400, 'invalid body'));
-				else next();
+					if (
+						req.body.type === collectionTypes.searchingCollection &&
+						!req.body.searchQuery
+					)
+						next(createError(400, 'invalid body'));
+					else next();
+				});
 			}
 		),
 		patch: catchAsync(
 			async (req: IRequest, res: Response, next: NextFunction) => {
-				this.preventMaliciousBody(this.bodyKeys.patch)(req, res, next);
+				this.preventMaliciousBody(this.bodyKeys.patch)(req, res, err => {
+					if (err) return next(err);
 
-				if (
-					req.collection.type === collectionTypes.collection &&
-					!!req.body.searchQuery
-				)
-					next(createError(400, 'invalid body'));
-				else next();
+					if (
+						req.collection.type === collectionTypes.collection &&
+						!!req.body.searchQuery
+					)
+						next(createError(400, 'invalid body'));
+					else next();
+				});
 			}
 		)
 	};

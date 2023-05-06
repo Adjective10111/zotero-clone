@@ -32,8 +32,10 @@ export class GroupController extends Controller<typeof Group> {
 				req.body.newEditors = undefined;
 			}
 
-			this.preventMaliciousBody(this.bodyKeys.patch)(req, res, next);
-			next();
+			this.preventMaliciousBody(this.bodyKeys.patch)(req, res, err => {
+				if (err) next(err);
+				else next();
+			});
 		}
 	};
 

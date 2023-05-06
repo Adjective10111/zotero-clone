@@ -42,15 +42,18 @@ export class LibraryController extends Controller<typeof Library> {
 	validateBody = {
 		create: catchAsync(
 			async (req: IRequest, res: Response, next: NextFunction) => {
-				this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
-				if (req.body.group) {
-					if (req.body.owner) return next(createError(400, 'invalid body'));
-					const group = await Group.findById(req.body.group);
-					if (!group) return next(createError(400, 'invalid group'));
-					req.body.owner = group.owner;
-				} else if (!req.body.owner)
-					return next(createError(400, 'invalid body'));
-				next();
+				this.preventMaliciousBody(this.bodyKeys.create)(req, res, async err => {
+					if (err) return next(err);
+
+					if (req.body.group) {
+						if (req.body.owner) return next(createError(400, 'invalid body'));
+						const group = await Group.findById(req.body.group);
+						if (!group) return next(createError(400, 'invalid group'));
+						req.body.owner = group.owner;
+					} else if (!req.body.owner)
+						return next(createError(400, 'invalid body'));
+					next();
+				});
 			}
 		),
 		patch: this.preventMaliciousBody(this.bodyKeys.patch)
