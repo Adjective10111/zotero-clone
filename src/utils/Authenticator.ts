@@ -80,13 +80,17 @@ export default class Authenticator {
 		UserModel: Model<genericUser & any>,
 		cookieName?: string
 	) {
-		return async function (req: IRequest, res: Response, next: NextFunction) {
+		return catchAsync(async function (
+			req: IRequest,
+			res: Response,
+			next: NextFunction
+		) {
 			try {
 				const user = await Authenticator.getUser(req, UserModel, cookieName);
 				req.user = user;
 			} catch (err) {}
 			next();
-		};
+		});
 	}
 	static authenticate(
 		UserModel: Model<genericUser & any>,

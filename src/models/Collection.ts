@@ -5,7 +5,11 @@ import Item, { type IItem } from './Item';
 import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
 
-const collectionTypes = ['SearchingCollection', 'Collection'];
+export const collectionTypes = {
+	searchingCollection: 'SearchingCollection',
+	collection: 'Collection',
+	values: ['SearchingCollection', 'Collection']
+};
 interface IStdCollection extends ITimestamped {
 	name: string;
 	parent: LibraryDoc;
@@ -65,9 +69,11 @@ const collectionSchema = new Schema<
 			required: [true, 'for better performance include the type'],
 			validate: {
 				validator: function (value: string): boolean {
-					return collectionTypes.includes(value);
+					return collectionTypes.values.includes(value);
 				},
-				message: `type must be either "${collectionTypes.join('" or "')}"`
+				message: `type must be either "${collectionTypes.values.join(
+					'" or "'
+				)}"`
 			}
 		},
 		searchQuery: {

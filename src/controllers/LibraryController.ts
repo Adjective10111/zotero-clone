@@ -3,7 +3,7 @@ import Collection from '../models/Collection';
 import Group from '../models/Group';
 import Library, { type LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
-import { createError, wrapAsync } from '../utils/errorFactory';
+import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
 import { IFilterRequest, IRequest } from '../utils/types';
 
 interface ILRequest extends IRequest {
@@ -40,16 +40,19 @@ export class LibraryController extends Controller<typeof Library> {
 		patch: { allowed: ['name', 'group', 'private'] }
 	};
 	validateBody = {
-		create: async (req: IRequest, res: Response, next: NextFunction) => {
-			this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
-			if (req.body.group) {
-				if (req.body.owner) return next(createError(400, 'invalid body'));
-				const group = await Group.findById(req.body.group);
-				if (!group) return next(createError(400, 'invalid group'));
-				req.body.owner = group.owner;
-			} else if (!req.body.owner) return next(createError(400, 'invalid body'));
-			next();
-		},
+		create: catchAsync(
+			async (req: IRequest, res: Response, next: NextFunction) => {
+				this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
+				if (req.body.group) {
+					if (req.body.owner) return next(createError(400, 'invalid body'));
+					const group = await Group.findById(req.body.group);
+					if (!group) return next(createError(400, 'invalid group'));
+					req.body.owner = group.owner;
+				} else if (!req.body.owner)
+					return next(createError(400, 'invalid body'));
+				next();
+			}
+		),
 		patch: this.preventMaliciousBody(this.bodyKeys.patch)
 	};
 
@@ -68,11 +71,21 @@ export class LibraryController extends Controller<typeof Library> {
 	filterByOwner = super.filterByOwnerFactory('owner');
 
 	authorizeOwnership = super.authorizeOwnershipFactory(this.modelName, 'owner');
-	async authorizeView(req: ILRequest, res: Response, next: NextFunction) {
+	@wrapAsync
+	static async authorizeView(
+		req: ILRequest,
+		res: Response,
+		next: NextFunction
+	) {
 		if (await req.library?.canView(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}
-	async authorizeEdit(req: ILRequest, res: Response, next: NextFunction) {
+	@wrapAsync
+	static async authorizeEdit(
+		req: ILRequest,
+		res: Response,
+		next: NextFunction
+	) {
 		if (await req.library?.canEdit(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}

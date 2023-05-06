@@ -4,7 +4,7 @@ import Group, { GroupDoc } from '../models/Group';
 import { LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
 import { isEmpty } from '../utils/basicFunctions';
-import { createError } from '../utils/errorFactory';
+import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 
 export interface IGRequest extends IRequest {
@@ -52,6 +52,7 @@ export class GroupController extends Controller<typeof Group> {
 			next();
 		else next(createError(403, 'unauthorized'));
 	}
+	@wrapAsync
 	async filterViewable(req: IGRequest, res: Response, next: NextFunction) {
 		if (!req.group) return next(createError(400, 'no group'));
 		req.group.libraries = await req.group.libraries.filter(

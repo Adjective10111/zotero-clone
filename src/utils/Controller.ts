@@ -83,6 +83,13 @@ class QueryHandler<DocType> {
 	}
 }
 
+interface ConditionalMiddleware {
+	if: CustomRequestHandler<Request, Response, boolean>[];
+	then: RequestHandler[];
+	else?: RequestHandler[];
+	negated?: boolean;
+}
+
 export default abstract class Controller<DocType extends Model<any>> {
 	modelName: string;
 
@@ -92,9 +99,9 @@ export default abstract class Controller<DocType extends Model<any>> {
 
 	debugLog(req: IRequest, res: Response, next: NextFunction) {
 		console.log(
-			`${Date.now()} - ParamKeys: ${Object.keys(req.params)} - ${
-				req.user
-			} - BodyKeys: ${Object.keys(req.body)}`
+			`${Date.now()} - ${req.url} - ParamKeys: ${Object.keys(
+				req.params
+			)} - BodyKeys: ${Object.keys(req.body)}`
 		);
 		next();
 	}
@@ -145,7 +152,8 @@ export default abstract class Controller<DocType extends Model<any>> {
 
 	createPopulateArray(...populateArray: PopulateOptions[]) {
 		return function (req: IPopulateRequest, res: Response, next: NextFunction) {
-			req.populateArray = populateArray;
+			if (!req.populateArray) req.populateArray = [];
+			req.populateArray = [...req.populateArray, ...populateArray];
 
 			next();
 		};
@@ -174,12 +182,14 @@ export default abstract class Controller<DocType extends Model<any>> {
 		next(createError(403, 'Unauthorized Access'));
 	}
 
-	conditionalMiddleware(
-		middleware: RequestHandler,
-		negated: boolean,
-		...conditions: CustomRequestHandler<Request, Response, boolean>[]
-	) {
+	condition(conditionalObj: ConditionalMiddleware) {
 		return function (req: Request, res: Response, next: NextFunction) {
+			const {
+				if: conditions,
+				then: middlewares,
+				else: elseMiddlewares,
+				negated
+			} = conditionalObj;
 			let result = true;
 			conditions.forEach(cond => {
 				let evaluated = cond(req, res, next);
@@ -187,11 +197,22 @@ export default abstract class Controller<DocType extends Model<any>> {
 				if (result) result = result && evaluated;
 			});
 
-			if (result) return middleware(req, res, next);
+			if (result)
+				return middlewares.forEach(middleware => {
+					middleware(req, res, next);
+				});
+			else if (elseMiddlewares)
+				return elseMiddlewares.forEach(middleware => {
+					middleware(req, res, next);
+				});
 			next();
 		};
 	}
 
+	static authorizationSpecialKeys = {
+		method: 'method:',
+		async: 'async:'
+	};
 	authorizeOwnershipFactory(...nestedOwnerId: string[]) {
 		return function (req: IRequest, res: Response, next: NextFunction) {
 			let ownerId: any = req;
@@ -206,14 +227,16 @@ export default abstract class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	isChildRouter(parentParam: string) {
-		return function (
-			req: IRequest,
-			res: Response,
-			next: NextFunction
-		): boolean {
-			return !!req.params[parentParam];
+	useAsParentParam(paramName: string) {
+		return function (req: IRequest, res: Response, next: NextFunction) {
+			req.isChildRouter = req.params[paramName];
+			next();
 		};
+	}
+	allowChildRouter(req: IRequest, res: Response, next: NextFunction) {
+		if (!req.isChildRouter)
+			next(createError(400, 'should be accessed through a parent route'));
+		else next();
 	}
 
 	//#region CRUD operations:
@@ -231,6 +254,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 			}
 
 			req[this.modelName] = document;
+
 			next();
 		}
 	);

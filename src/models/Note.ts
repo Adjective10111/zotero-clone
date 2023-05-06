@@ -4,10 +4,10 @@ import { type ICollection } from './Collection';
 import { type IItem } from './Item';
 import { type LibraryDoc } from './Library';
 
-type ParentModelName = 'item' | 'collection' | 'library';
+type ParentModelName = 'item' | 'collection';
 
 export interface INote extends ITimestamped {
-	parent: IItem | ICollection | LibraryDoc;
+	parent: IItem | ICollection;
 	parentModel: ParentModelName;
 
 	item?: IItem;
@@ -57,13 +57,6 @@ noteSchema.virtual('item', {
 
 noteSchema.virtual('collection', {
 	ref: 'Collection',
-	localField: 'parent',
-	foreignField: '_id',
-	justOne: true
-});
-
-noteSchema.virtual('library', {
-	ref: 'Library',
 	localField: 'parent',
 	foreignField: '_id',
 	justOne: true

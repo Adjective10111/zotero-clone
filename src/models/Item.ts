@@ -31,6 +31,7 @@ interface IItemMethods {
 }
 
 type ItemModel = Model<IItem, {}, IItemMethods>;
+export type ItemDoc = Doc<IItem, IItemMethods>;
 
 const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 	{

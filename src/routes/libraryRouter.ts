@@ -8,7 +8,9 @@ const controller = new LibraryController();
 router.use(
 	'/:id/collections',
 	controller.getOne,
+	LibraryController.authorizeView,
 	controller.filterByLibrary,
+	controller.useAsParentParam('id'),
 	collectionRouter
 );
 
@@ -32,13 +34,13 @@ router
 	.get(
 		controller.queuePopulateField.collections,
 		controller.getOne,
-		controller.authorizeView,
+		LibraryController.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.validateBody.patch,
 		controller.getOne,
-		controller.authorizeEdit,
+		LibraryController.authorizeEdit,
 		controller.patchDocument,
 		controller.sendResponse('patch')
 	)
