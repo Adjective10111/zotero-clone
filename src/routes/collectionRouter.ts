@@ -3,7 +3,7 @@ import { CollectionController } from '../controllers/CollectionController';
 import { LibraryController } from '../controllers/LibraryController';
 import itemRouter from './itemRouter';
 
-const router = Router({ mergeParams: true });
+const router = Router();
 const controller = new CollectionController();
 
 router.use(
