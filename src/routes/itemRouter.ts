@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { CollectionController } from '../controllers/CollectionController';
-import { ItemController } from '../controllers/ItemController';
-import { LibraryController } from '../controllers/LibraryController';
+import CollectionController from '../controllers/CollectionController';
+import ItemController from '../controllers/ItemController';
 
 const router = Router();
 const controller = new ItemController();
@@ -39,19 +38,9 @@ router
 	.route('/')
 	.get(controller.getAll, controller.sendResponse('getAll'))
 	.post(
-		controller.condition({
-			if: [controller.isParentLibrary],
-			then: [
-				LibraryController.authorizeEdit,
-				controller.addLibraryToBodyFromReq,
-				controller.addDefaultCollectionToBody
-			],
-			else: [
-				CollectionController.authorizeEdit,
-				controller.addLibraryToBodyFromCollection,
-				controller.addCollectionToBody
-			]
-		}),
+		CollectionController.authorizeEdit,
+		controller.addLibraryToBodyFromCollection,
+		controller.addCollectionToBody,
 		controller.validateBody.create,
 		controller.createOne,
 		controller.sendResponse('create')

@@ -8,10 +8,14 @@ interface IIRequest extends IRequest {
 	item?: ItemDoc;
 }
 
-export class ItemController extends Controller<typeof Item> {
+export default class ItemController extends Controller<typeof Item> {
 	populateOptions = {
-		parent: {
-			path: 'parent'
+		parentCollection: {
+			path: 'parentCollection'
+		},
+		library: {
+			path: 'library',
+			select: '-collections -duplicates -unfiledItems -bin'
 		},
 		attachments: {
 			path: 'attachments'
@@ -25,7 +29,7 @@ export class ItemController extends Controller<typeof Item> {
 		}
 	};
 	queuePopulateField = {
-		parent: this.createPopulateArray(this.populateOptions.parent),
+		parent: this.createPopulateArray(this.populateOptions.library),
 		data: this.createPopulateArray(
 			this.populateOptions.attachments,
 			this.populateOptions.notes,
@@ -35,10 +39,18 @@ export class ItemController extends Controller<typeof Item> {
 
 	bodyKeys = {
 		create: {
-			allowed: ['collections', 'metadata', 'tag', 'related'],
-			mandatory: ['name', 'parent', 'primaryAttachment', 'itemType']
+			allowed: ['metadata', 'tag', 'related'],
+			mandatory: [
+				'name',
+				'library',
+				'primaryAttachment',
+				'itemType',
+				'parentCollection'
+			]
 		},
-		patch: { allowed: ['name', 'collections', 'metadata', 'related', 'tag'] }
+		patch: {
+			allowed: ['name', 'parentCollection', 'metadata', 'related', 'tag']
+		}
 	};
 	validateBody = {
 		create: this.preventMaliciousBody(this.bodyKeys.create),
@@ -46,32 +58,15 @@ export class ItemController extends Controller<typeof Item> {
 	};
 
 	addLibraryToBodyFromCollection = this.moveReqKeyToBody(
-		'parent',
+		'library',
 		'collection',
 		'parent'
 	);
-	addLibraryToBodyFromReq = this.moveReqKeyToBody('parent', 'library', 'id');
 
 	constructor() {
 		super(Item);
 	}
 
-	isParentLibrary(req: IRequest): boolean {
-		return !!req.library;
-	}
-	isParentCollection(
-		req: IRequest,
-		res: Response,
-		next: NextFunction
-	): boolean {
-		return !!req.collection;
-	}
-
-	addDefaultCollectionToBody = this.moveReqKeyToBody(
-		'parentCollection',
-		'library',
-		'unfiledItems'
-	);
 	addCollectionToBody = this.moveReqKeyToBody(
 		'parentCollection',
 		'collection',

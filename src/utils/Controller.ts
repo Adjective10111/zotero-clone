@@ -159,6 +159,15 @@ export default abstract class Controller<DocType extends Model<any>> {
 		};
 	}
 
+	removePopulateArray(
+		req: IPopulateRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		req.populateArray = undefined;
+		next();
+	}
+
 	moveReqKeyToBody(bodyKey: string, ...nestedReqKey: string[]): RequestHandler {
 		return function (req: IRequest, res: Response, next: NextFunction) {
 			let iterator: any = req;

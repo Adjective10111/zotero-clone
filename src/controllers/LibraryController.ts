@@ -10,7 +10,7 @@ interface ILRequest extends IRequest {
 	library?: LibraryDoc;
 }
 
-export class LibraryController extends Controller<typeof Library> {
+export default class LibraryController extends Controller<typeof Library> {
 	populateOptions = {
 		duplicates: {
 			path: 'duplicates'

@@ -11,7 +11,9 @@ interface ICRequest extends IRequest {
 	collection?: CollectionDoc;
 }
 
-export class CollectionController extends Controller<typeof Collection> {
+export default class CollectionController extends Controller<
+	typeof Collection
+> {
 	populateOptions = {
 		parent: {
 			path: 'parent'

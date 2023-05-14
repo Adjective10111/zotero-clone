@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { CollectionController } from '../controllers/CollectionController';
-import { LibraryController } from '../controllers/LibraryController';
+import CollectionController from '../controllers/CollectionController';
+import LibraryController from '../controllers/LibraryController';
 import itemRouter from './itemRouter';
 
 const router = Router();
@@ -10,6 +10,7 @@ router.use(
 	'/:id/items',
 	controller.queuePopulateField.parent,
 	controller.getOne,
+	controller.removePopulateArray,
 	CollectionController.authorizeView,
 	controller.useAsParentParam('id'),
 	itemRouter

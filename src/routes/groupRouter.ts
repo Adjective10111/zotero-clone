@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import FileController from '../controllers/FileController';
-import { GroupController } from '../controllers/GroupController';
+import GroupController from '../controllers/GroupController';
 
 const router = Router();
 const controller = new GroupController();

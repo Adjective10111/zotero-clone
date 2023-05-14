@@ -11,7 +11,7 @@ export interface IGRequest extends IRequest {
 	group?: GroupDoc;
 }
 
-export class GroupController extends Controller<typeof Group> {
+export default class GroupController extends Controller<typeof Group> {
 	bodyKeys = {
 		create: { allowed: ['logo', 'editors'], mandatory: ['name', 'owner'] },
 		patch: { allowed: ['name', 'editors', 'newEditors'] }
