@@ -7,7 +7,7 @@ const router = Router();
 const controller = new CollectionController();
 
 router.use(
-	'/:id/item',
+	'/:id/items',
 	controller.queuePopulateField.parent,
 	controller.getOne,
 	CollectionController.authorizeView,

@@ -5,7 +5,7 @@ import { LibraryController } from '../controllers/LibraryController';
 
 const router = Router();
 const controller = new ItemController();
-// router.get('/metadata/:id');
+// router.get('/:id/metadata');
 
 router
 	.route('/:id')
@@ -52,8 +52,7 @@ router
 		}),
 		controller.validateBody.create,
 		controller.createOne,
-		controller.sendResponse('create'),
-		controller.debugLog
+		controller.sendResponse('create')
 	);
 
 export default router;

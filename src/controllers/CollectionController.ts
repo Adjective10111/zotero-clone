@@ -5,7 +5,7 @@ import Collection, {
 } from '../models/Collection';
 import Controller from '../utils/Controller';
 import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
-import { IRequest } from '../utils/types';
+import { IFilterRequest, IRequest } from '../utils/types';
 
 interface ICRequest extends IRequest {
 	collection?: CollectionDoc;
@@ -71,6 +71,14 @@ export class CollectionController extends Controller<typeof Collection> {
 
 	constructor() {
 		super(Collection);
+	}
+
+	filterByCollection(req: IFilterRequest, res: Response, next: NextFunction) {
+		req.defaultFilter = {
+			...(req.defaultFilter || {}),
+			collections: { $elemMatch: { $eq: req.collection?.id } }
+		};
+		next();
 	}
 
 	@wrapAsync

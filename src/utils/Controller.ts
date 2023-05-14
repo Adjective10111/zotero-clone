@@ -1,15 +1,15 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Model, PopulateOptions, Query, QueryOptions } from 'mongoose';
 import { isEmpty } from './basicFunctions';
-import { catchAsync, createError } from './errorFactory';
+import { OperationalError, catchAsync, createError } from './errorFactory';
 import {
 	BodyValidationKeys,
 	CRUD,
-	CustomRequestHandler,
 	IFilterRequest,
 	IPopulateRequest,
 	IRemoveFieldsRequest,
-	IRequest
+	IRequest,
+	MiddlewareCondition
 } from './types';
 
 class QueryHandler<DocType> {
@@ -84,7 +84,7 @@ class QueryHandler<DocType> {
 }
 
 interface ConditionalMiddleware {
-	if: CustomRequestHandler<Request, Response, boolean>[];
+	if: MiddlewareCondition[];
 	then: RequestHandler[];
 	else?: RequestHandler[];
 	negated?: boolean;
@@ -99,9 +99,9 @@ export default abstract class Controller<DocType extends Model<any>> {
 
 	debugLog(req: IRequest, res: Response, next: NextFunction) {
 		console.log(
-			`${Date.now()} - ${req.url} - ParamKeys: ${Object.keys(
-				req.params
-			)} - BodyKeys: ${Object.keys(req.body)}`
+			`${Date.now()} - ${req.url} - ParamKeys: ${Object.keys(req.params)} - ${
+				req.isChildRouter
+			} - BodyKeys: ${Object.keys(req.body)}`
 		);
 		next();
 	}
@@ -176,7 +176,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 		this.moveReqKeyToBody(bodyKey, 'user', '_id');
 
 	static unavailable(req: Request, res: Response, next: NextFunction) {
-		next(createError(404, 'Page Not Found'));
+		next(createError(404, `UNAVAILABLE: Can't access ${req.originalUrl}`));
 	}
 	static unauthorized(req: Request, res: Response, next: NextFunction) {
 		next(createError(403, 'Unauthorized Access'));
@@ -192,20 +192,28 @@ export default abstract class Controller<DocType extends Model<any>> {
 			} = conditionalObj;
 			let result = true;
 			conditions.forEach(cond => {
-				let evaluated = cond(req, res, next);
+				let evaluated = cond(req);
 				if (negated) evaluated = !evaluated;
 				if (result) result = result && evaluated;
 			});
 
+			let error: undefined | Error = undefined;
 			if (result)
-				return middlewares.forEach(middleware => {
-					middleware(req, res, next);
+				middlewares.forEach(middleware => {
+					if (error !== undefined) return;
+					middleware(req, res, err => {
+						if (err) error = err;
+					});
 				});
 			else if (elseMiddlewares)
-				return elseMiddlewares.forEach(middleware => {
-					middleware(req, res, next);
+				middlewares.forEach(middleware => {
+					if (error !== undefined) return;
+					middleware(req, res, err => {
+						if (err) error = err;
+					});
 				});
-			next();
+
+			error === undefined ? next() : next(error);
 		};
 	}
 

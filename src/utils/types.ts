@@ -62,7 +62,7 @@ export interface IPopulateRequest extends IRequest {
 }
 
 export interface IFilterRequest extends IPopulateRequest {
-	defaultFilter?: object;
+	defaultFilter?: { [key: string]: any };
 }
 
 export type CustomRequestHandler<
@@ -70,3 +70,5 @@ export type CustomRequestHandler<
 	Res = Response,
 	Ret = Promise<void> | void
 > = (req: Req, res: Res, next: NextFunction) => Ret;
+
+export type MiddlewareCondition = (req: Request) => boolean;

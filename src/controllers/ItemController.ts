@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import Item, { ItemDoc } from '../models/Item';
 import Controller from '../utils/Controller';
-import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
+import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 
 interface IIRequest extends IRequest {
@@ -51,7 +51,7 @@ export class ItemController extends Controller<typeof Item> {
 		super(Item);
 	}
 
-	isParentLibrary(req: IRequest, res: Response, next: NextFunction): boolean {
+	isParentLibrary(req: IRequest): boolean {
 		return !!req.library;
 	}
 	isParentCollection(
