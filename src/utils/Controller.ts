@@ -206,7 +206,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 					});
 				});
 			else if (elseMiddlewares)
-				middlewares.forEach(middleware => {
+				elseMiddlewares.forEach(middleware => {
 					if (error !== undefined) return;
 					middleware(req, res, err => {
 						if (err) error = err;
