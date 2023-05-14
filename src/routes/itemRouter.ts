@@ -43,11 +43,13 @@ router
 			if: [controller.isParentLibrary],
 			then: [
 				LibraryController.authorizeEdit,
-				controller.addLibraryToBodyFromReq
+				controller.addLibraryToBodyFromReq,
+				controller.addDefaultCollectionToBody
 			],
 			else: [
 				CollectionController.authorizeEdit,
-				controller.addLibraryToBodyFromCollection
+				controller.addLibraryToBodyFromCollection,
+				controller.addCollectionToBody
 			]
 		}),
 		controller.validateBody.create,

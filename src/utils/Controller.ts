@@ -159,7 +159,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	moveReqKeyToBody(bodyKey: string, ...nestedReqKey: string[]) {
+	moveReqKeyToBody(bodyKey: string, ...nestedReqKey: string[]): RequestHandler {
 		return function (req: IRequest, res: Response, next: NextFunction) {
 			let iterator: any = req;
 			nestedReqKey.forEach(key => {

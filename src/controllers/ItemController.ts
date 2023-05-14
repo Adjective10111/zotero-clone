@@ -18,13 +18,18 @@ export class ItemController extends Controller<typeof Item> {
 		},
 		notes: {
 			path: 'notes'
+		},
+		related: {
+			path: 'related.item',
+			select: 'name itemType parentCollection'
 		}
 	};
 	queuePopulateField = {
 		parent: this.createPopulateArray(this.populateOptions.parent),
 		data: this.createPopulateArray(
 			this.populateOptions.attachments,
-			this.populateOptions.notes
+			this.populateOptions.notes,
+			this.populateOptions.related
 		)
 	};
 
@@ -62,14 +67,25 @@ export class ItemController extends Controller<typeof Item> {
 		return !!req.collection;
 	}
 
+	addDefaultCollectionToBody = this.moveReqKeyToBody(
+		'parentCollection',
+		'library',
+		'unfiledItems'
+	);
+	addCollectionToBody = this.moveReqKeyToBody(
+		'parentCollection',
+		'collection',
+		'id'
+	);
+
 	@wrapAsync
 	async authorizeEdit(req: IIRequest, res: Response, next: NextFunction) {
-		if (await req.item?.parent?.canEdit(req.user?.id)) next();
+		if (await req.item?.library?.canEdit(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}
 	@wrapAsync
 	async authorizeView(req: IIRequest, res: Response, next: NextFunction) {
-		if (await req.item?.parent?.canView(req.user?.id)) next();
+		if (await req.item?.library?.canView(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}
 }

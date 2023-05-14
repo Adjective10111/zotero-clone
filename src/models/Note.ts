@@ -2,7 +2,6 @@ import { Schema, Types, model, type Model } from 'mongoose';
 import { type ITimestamped } from '../utils/types';
 import { type ICollection } from './Collection';
 import { type IItem } from './Item';
-import { type LibraryDoc } from './Library';
 
 type ParentModelName = 'item' | 'collection';
 
@@ -11,8 +10,7 @@ export interface INote extends ITimestamped {
 	parentModel: ParentModelName;
 
 	item?: IItem;
-	collection?: ICollection;
-	library?: LibraryDoc;
+	parentCollection?: ICollection;
 
 	text: string;
 }
@@ -55,7 +53,7 @@ noteSchema.virtual('item', {
 	justOne: true
 });
 
-noteSchema.virtual('collection', {
+noteSchema.virtual('parentCollection', {
 	ref: 'Collection',
 	localField: 'parent',
 	foreignField: '_id',

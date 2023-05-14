@@ -11,8 +11,8 @@ interface ITag {
 }
 
 export interface IItem extends ITimestamped {
-	parent: LibraryDoc;
-	collections: Doc<ICollection>[] | Types.ObjectId[];
+	library: LibraryDoc;
+	parentCollection: Doc<ICollection> | Types.ObjectId;
 
 	name: string;
 	primaryAttachment: AnyAttachment;
@@ -35,14 +35,15 @@ export type ItemDoc = Doc<IItem, IItemMethods>;
 
 const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 	{
-		parent: {
+		library: {
 			type: Types.ObjectId,
 			ref: 'Library',
 			required: [true, 'must belong to a Library']
 		},
-		collections: {
-			type: [{ type: Types.ObjectId, ref: 'Collection' }],
-			default: []
+		parentCollection: {
+			type: Types.ObjectId,
+			ref: 'Collection',
+			required: [true, 'must belong to a collection']
 		},
 
 		name: {
@@ -124,20 +125,6 @@ itemSchema.methods.relate = async function (
 
 itemSchema.pre('save', function (next) {
 	if (this.isNew) this.itemType = this.primaryAttachment.type;
-	next();
-});
-itemSchema.pre('save', function (next) {
-	if (this.isModified('collections')) {
-		if (this.collections.length === 0)
-			this.collections = [
-				this.parent.unfiledItems._id
-			] as typeof this.collections;
-		else if (this.collections.length > 1) {
-			const index = this.collections.indexOf(this.parent.unfiledItems.id);
-			if (index !== -1) this.collections.splice(index, 1);
-		}
-	}
-
 	next();
 });
 

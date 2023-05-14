@@ -91,7 +91,7 @@ librarySchema.methods.initialize = async function (): Promise<void> {
 		name: 'duplicates',
 		type: 'SearchingCollection',
 		searchQuery: {
-			parent: this.id,
+			library: this.id,
 			$where: 'this.collections.length > 1'
 		}
 	});
