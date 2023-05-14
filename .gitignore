@@ -1,5 +1,6 @@
+.vscode/
 node_modules/
+src/public/*/*
+temp/
 *.env
 *.bak
-.vscode/
-temp/
