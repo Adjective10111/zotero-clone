@@ -8,11 +8,11 @@ import { type NumericString } from './types';
 /**
  * generic user creation
  * keys include:
- * 	 photo, name, email, mobile,
+ * 	 profile, name, email, mobile,
  *	 password, passwordResetToken, passwordResetExpiration, allowedSessionsAfter
  */
 export interface genericUser {
-	photo?: string;
+	profile?: string;
 	name: string;
 	email: string;
 	// mobile?: NumericString | string;

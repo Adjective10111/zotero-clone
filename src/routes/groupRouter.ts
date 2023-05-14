@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import FileController from '../controllers/FileController';
 import { GroupController } from '../controllers/GroupController';
-import FileManager from '../utils/FileManager';
 
 const router = Router();
 const controller = new GroupController();
-const fileController = new FileController(
-	new FileManager('image', FileManager.createMemoryStorage())
-);
+const fileController = FileController.createImageController();
 
 router
 	.route('/')
@@ -17,9 +14,9 @@ router
 		controller.sendResponse('getAll')
 	)
 	.post(
+		fileController.uploadLogo,
 		controller.addOwner,
 		controller.validateBody.create,
-		fileController.uploadLogo,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
 		controller.createOne,
@@ -36,8 +33,8 @@ router
 	.patch(
 		controller.getOne,
 		controller.authorizeOwnership,
-		controller.validateBody.patch,
 		fileController.uploadLogo,
+		controller.validateBody.patch,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
 		controller.patchDocument,

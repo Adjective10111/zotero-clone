@@ -1,22 +1,20 @@
 import { Router } from 'express';
 import FileController from '../controllers/FileController';
 import UserController from '../controllers/UserController';
-import FileManager from '../utils/FileManager';
 
 const router = Router();
 const controller = new UserController();
-const fileController = new FileController(
-	new FileManager('image', FileManager.createMemoryStorage())
-);
+const fileController = FileController.createImageController();
 
 router.post(
 	'/signup',
+	fileController.uploadProfile,
 	controller.validateBody.signUp,
 	controller.validateRoleValue,
 	controller.removeField.password,
-	fileController.uploadProfile,
 	fileController.resizeProfile,
 	fileController.addFilePath('profile'),
+	controller.debugLog,
 	controller.createOne,
 	controller.sendResponse('create')
 );
@@ -47,9 +45,9 @@ router
 	.route('/me')
 	.get(controller.sendResponse('getOne'))
 	.patch(
+		fileController.uploadProfile,
 		controller.validateBody.patch,
 		controller.validateRoleValue,
-		fileController.uploadProfile,
 		fileController.resizeProfile,
 		fileController.addFilePath('profile'),
 		controller.patchDocument,

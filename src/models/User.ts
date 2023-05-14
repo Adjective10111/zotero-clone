@@ -14,7 +14,7 @@ export type UserDoc = Doc<IUser, IUserMethods>;
 type UserModel = Model<IUser, {}, IUserMethods>;
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
-	photo: {
+	profile: {
 		type: String
 	},
 	name: {

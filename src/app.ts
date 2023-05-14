@@ -36,27 +36,13 @@ app
 	.use(compression());
 
 // open-access folder for files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(`${__dirname}/public`));
 
 // add dev middlewares
 if (process.env.NODE_ENV === 'dev') {
 	app.use(morgan('dev'));
 }
 
-app
-	.use('/api', apiRouter)
-	.use(
-		'*',
-		function (req: Request, res: Response, next: NextFunction) {
-			// todo fix this weird bug
-			if (res.headersSent) {
-				console.log(req.url);
-				console.log(req.body);
-				console.log(req.params);
-			} else next();
-		},
-		Controller.unavailable
-	)
-	.use(errorHandler);
+app.use('/api', apiRouter).all('*', Controller.unavailable).use(errorHandler);
 
 export default app;
