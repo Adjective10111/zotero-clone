@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import multer, { FileFilterCallback, Multer, type StorageEngine } from 'multer';
-import sharp from 'sharp';
+import sharp, { Sharp } from 'sharp';
 import { createError } from './errorFactory';
 
 type File = Express.Multer.File;
@@ -8,9 +8,11 @@ type Request = Express.Request;
 
 type DynamicStringCreator = (req: Request, file: File) => string;
 type FileFilter = multer.Options['fileFilter'];
+type Format = keyof sharp.FormatEnum;
 interface ResizeObject {
 	resize?: [number, number];
 	quality?: number;
+	format?: Format;
 }
 
 const fileFilter = {
@@ -109,12 +111,13 @@ export default class FileManager {
 		resizeObject: ResizeObject = {}
 	): Promise<File> {
 		file.filename = fileFullPath.split('/')[-1];
-		const { resize = [500, 500], quality = 90 } = resizeObject;
+		const { resize = [500, 500], quality = 90, format = 'jpeg' } = resizeObject;
 
+		// @ts-ignore
 		await sharp(file.buffer)
 			.resize(...resize)
-			.toFormat('jpeg')
-			.jpeg({ quality: quality })
+			.toFormat(format)
+			[format]({ quality: quality })
 			.toFile(fileFullPath);
 
 		return file;

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import UserController from '../controllers/UserController';
 import attachmentRouter from './attachmentRouter';
+import attachmentTypeRouter from './attachmentTypeRouter';
 import collectionRouter from './collectionRouter';
 import groupRouter from './groupRouter';
 import itemRouter from './itemRouter';
@@ -18,6 +19,7 @@ router.use('/libraries', libraryRouter);
 router.use('/collections', collectionRouter);
 router.use('/items', itemRouter);
 router.use('/attachments', attachmentRouter);
+router.use('/attachmentTypes', attachmentTypeRouter);
 router.use('/notes', noteRouter);
 
 export default router;

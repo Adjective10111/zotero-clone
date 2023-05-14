@@ -10,7 +10,7 @@ interface IAType {
 const aTypeSchema = new Schema<IAType>({
 	icon: {
 		type: String,
-		default: 'public/icons/type.png'
+		default: 'icons/type.png'
 	},
 	name: {
 		type: String,
