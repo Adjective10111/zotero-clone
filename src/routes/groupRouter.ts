@@ -1,8 +1,13 @@
-import { NextFunction, Response, Router } from 'express';
-import { GroupController, IGRequest } from '../controllers/GroupController';
+import { Router } from 'express';
+import FileController from '../controllers/FileController';
+import { GroupController } from '../controllers/GroupController';
+import FileManager from '../utils/FileManager';
 
 const router = Router();
 const controller = new GroupController();
+const fileController = new FileController(
+	new FileManager('image', FileManager.createMemoryStorage())
+);
 
 router
 	.route('/')
@@ -14,6 +19,9 @@ router
 	.post(
 		controller.addOwner,
 		controller.validateBody.create,
+		fileController.uploadLogo,
+		fileController.resizeLogo,
+		fileController.addFilePath('logo'),
 		controller.createOne,
 		controller.sendResponse('create')
 	);
@@ -29,6 +37,9 @@ router
 		controller.getOne,
 		controller.authorizeOwnership,
 		controller.validateBody.patch,
+		fileController.uploadLogo,
+		fileController.resizeLogo,
+		fileController.addFilePath('logo'),
 		controller.patchDocument,
 		controller.sendResponse('patch')
 	)
