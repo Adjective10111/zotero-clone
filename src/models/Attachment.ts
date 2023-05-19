@@ -1,33 +1,24 @@
-import { model, Schema, Types, type Model } from 'mongoose';
-import { type ITimestamped } from '../utils/types';
-import { type IItem } from './Item';
+import { Schema, Types, model, type Model } from 'mongoose';
+import { Doc, type ITimestamped } from '../utils/types';
+import { ATypeDoc } from './AttachmentType';
+import { type ItemDoc } from './Item';
 
-interface IAttachment {
-	parent: IItem;
+interface IAttachment extends ITimestamped {
+	parent: ItemDoc;
+	name: string;
+	type: ATypeDoc;
+	path: string;
 }
-
-export interface IWebsite extends IAttachment {
-	type: 'website';
-	html?: string;
-	url?: string;
-}
-
-export interface IFile extends IAttachment {
-	type: 'file';
-	filename: string;
-	pages?: number;
-}
-
-export type AnyAttachment = ITimestamped & (IWebsite | IFile);
 
 interface IAttachmentsMethods {
 	populateReference(): Promise<void>;
 }
+export type AttachmentDoc = Doc<IAttachment, IAttachmentsMethods>;
 
-type AttachmentModel = Model<AnyAttachment, {}, IAttachmentsMethods>;
+type AttachmentModel = Model<IAttachment, {}, IAttachmentsMethods>;
 
 const attachmentSchema = new Schema<
-	AnyAttachment,
+	IAttachment,
 	AttachmentModel,
 	IAttachmentsMethods
 >(
@@ -36,25 +27,28 @@ const attachmentSchema = new Schema<
 			type: Types.ObjectId,
 			required: [true, 'should be attachment']
 		},
-		type: {
+		name: {
 			type: String,
+			required: [true, 'should have a name']
+		},
+		type: {
+			type: Types.ObjectId,
+			ref: 'AttachmentType',
 			required: [true, 'the type should be known']
 		},
-		// website
-		html: String,
-		url: String,
-		// file
-		filename: String,
-		pages: Number
+		path: {
+			type: String,
+			required: [true, 'should refer to a file']
+		}
 	},
 	{
 		timestamps: true
 	}
 );
 
-attachmentSchema.index({ parent: 1 });
+attachmentSchema.index({ parent: 1, name: 1, type: 1 }, { unique: true });
 
-const Attachment = model<AnyAttachment, AttachmentModel>(
+const Attachment = model<IAttachment, AttachmentModel>(
 	'Attachment',
 	attachmentSchema
 );

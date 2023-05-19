@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import CollectionController from '../controllers/CollectionController';
 import LibraryController from '../controllers/LibraryController';
+import attachmentRouter from './attachmentRouter';
 import itemRouter from './itemRouter';
 
 const router = Router();
@@ -14,6 +15,15 @@ router.use(
 	CollectionController.authorizeView,
 	controller.useAsParentParam('id'),
 	itemRouter
+);
+router.use(
+	'/:id/attachments',
+	controller.queuePopulateField.parent,
+	controller.getOne,
+	controller.removePopulateArray,
+	CollectionController.authorizeEdit,
+	controller.useAsParentParam('id'),
+	attachmentRouter
 );
 
 router

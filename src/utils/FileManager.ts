@@ -1,12 +1,14 @@
+import { createReadStream } from 'fs';
 import * as fs from 'fs/promises';
 import multer, { FileFilterCallback, Multer, type StorageEngine } from 'multer';
-import sharp, { Sharp } from 'sharp';
+import sharp from 'sharp';
 import { createError } from './errorFactory';
+import { IRequest } from './types';
 
 type File = Express.Multer.File;
 type Request = Express.Request;
 
-type DynamicStringCreator = (req: Request, file: File) => string;
+type DynamicStringCreator = (req: IRequest, file: File) => string;
 type FileFilter = multer.Options['fileFilter'];
 type Format = keyof sharp.FormatEnum;
 interface ResizeObject {
@@ -121,5 +123,44 @@ export default class FileManager {
 			.toFile(fileFullPath);
 
 		return file;
+	}
+
+	async streamFile(
+		filePath: string,
+		contentType: string,
+		range: string,
+		CHUNK_SIZE = 1024 ** 2
+	) {
+		const stats = await fs.stat(filePath);
+		if (!stats.isFile()) throw createError(404, 'no file found');
+
+		const rangeParts = range
+			.replace(/bytes=/, '')
+			.split('-')
+			.map(value => parseInt(value, 10));
+		const start = rangeParts[0];
+		const end = rangeParts[1] ? rangeParts[1] : stats.size - 1;
+		if (CHUNK_SIZE > 1024 ** 2) CHUNK_SIZE = 1024 ** 2;
+		const headers = {
+			'Accept-Ranges': 'bytes',
+			'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+			'Content-Length': end - start + 1,
+			'Content-Type': contentType
+		};
+		const stream = createReadStream(filePath, { start, end });
+
+		return {
+			stream,
+			headers
+		};
+	}
+
+	async streamVideo(videoPath: string, range: string, CHUNK_SIZE = 1024 ** 2) {
+		return await this.streamFile(
+			videoPath,
+			`video/${videoPath.split('.')[-1]}`,
+			range,
+			CHUNK_SIZE
+		);
 	}
 }

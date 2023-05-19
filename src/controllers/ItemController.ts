@@ -74,12 +74,20 @@ export default class ItemController extends Controller<typeof Item> {
 	);
 
 	@wrapAsync
-	async authorizeEdit(req: IIRequest, res: Response, next: NextFunction) {
+	static async authorizeEdit(
+		req: IIRequest,
+		res: Response,
+		next: NextFunction
+	) {
 		if (await req.item?.library?.canEdit(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}
 	@wrapAsync
-	async authorizeView(req: IIRequest, res: Response, next: NextFunction) {
+	static async authorizeView(
+		req: IIRequest,
+		res: Response,
+		next: NextFunction
+	) {
 		if (await req.item?.library?.canView(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}

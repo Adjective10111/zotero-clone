@@ -1,4 +1,5 @@
-import { Schema, Types, model, type Model } from 'mongoose';
+import { Schema, model } from 'mongoose';
+import { Doc } from '../utils/types';
 
 interface IAType {
 	icon: string;
@@ -6,6 +7,8 @@ interface IAType {
 	api?: string;
 	metadataKeys?: string[];
 }
+
+export type ATypeDoc = Doc<IAType>;
 
 const aTypeSchema = new Schema<IAType>({
 	icon: {

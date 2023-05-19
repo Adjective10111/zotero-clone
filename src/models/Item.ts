@@ -1,6 +1,7 @@
 import { Schema, Types, model, type Model } from 'mongoose';
 import { type Doc, type ITimestamped } from '../utils/types';
-import { type AnyAttachment } from './Attachment';
+import { type AttachmentDoc } from './Attachment';
+import { ATypeDoc } from './AttachmentType';
 import { type ICollection } from './Collection';
 import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
@@ -15,11 +16,11 @@ export interface IItem extends ITimestamped {
 	parentCollection: Doc<ICollection> | Types.ObjectId;
 
 	name: string;
-	primaryAttachment: AnyAttachment;
-	itemType: string;
+	primaryAttachment: AttachmentDoc;
+	itemType?: ATypeDoc;
 	metadata?: object;
 
-	attachments?: AnyAttachment[];
+	attachments?: AttachmentDoc[];
 	notes?: INote[];
 
 	related: ({ name: string; item: IItem } | IItem)[];
@@ -56,7 +57,8 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 			required: [true, "must represent an attachment's metadata"]
 		},
 		itemType: {
-			type: String,
+			type: Types.ObjectId,
+			ref: 'AttachmentType',
 			default: 'unknown'
 		},
 		metadata: {
@@ -92,7 +94,8 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 	}
 );
 
-itemSchema.index({ parent: 1 });
+itemSchema.index({ parentCollection: 1, name: 1 }, { unique: true });
+itemSchema.index({ library: 1, name: 1 });
 itemSchema.index({ tag: 1 });
 
 itemSchema.virtual('attachments', {

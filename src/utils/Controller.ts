@@ -103,6 +103,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 				req.isChildRouter
 			} - BodyKeys: ${Object.keys(req.body)}`
 		);
+		console.log(req.originalUrl);
 		next();
 	}
 
@@ -226,10 +227,6 @@ export default abstract class Controller<DocType extends Model<any>> {
 		};
 	}
 
-	static authorizationSpecialKeys = {
-		method: 'method:',
-		async: 'async:'
-	};
 	authorizeOwnershipFactory(...nestedOwnerId: string[]) {
 		return function (req: IRequest, res: Response, next: NextFunction) {
 			let ownerId: any = req;
