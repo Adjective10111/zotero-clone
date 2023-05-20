@@ -2,6 +2,7 @@ import { Router } from 'express';
 import CollectionController from '../controllers/CollectionController';
 import ItemController from '../controllers/ItemController';
 import attachmentRouter from './attachmentRouter';
+import noteRouter from './noteRouter';
 
 const router = Router();
 const controller = new ItemController();
@@ -13,6 +14,15 @@ router.use(
 	ItemController.authorizeView,
 	controller.useAsParentParam('id'),
 	attachmentRouter
+);
+router.use(
+	'/:id/notes',
+	controller.queuePopulateField.parent,
+	controller.getOne,
+	controller.removePopulateArray,
+	ItemController.authorizeView,
+	controller.useAsParentParam('id'),
+	noteRouter
 );
 
 router
