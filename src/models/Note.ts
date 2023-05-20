@@ -1,16 +1,16 @@
 import { Schema, Types, model, type Model } from 'mongoose';
-import { type ITimestamped } from '../utils/types';
-import { type ICollection } from './Collection';
-import { type IItem } from './Item';
+import { Doc, type ITimestamped } from '../utils/types';
+import { CollectionDoc } from './Collection';
+import { ItemDoc } from './Item';
 
-type ParentModelName = 'item' | 'collection';
+type ParentModelName = 'parentItem' | 'parentCollection';
 
 export interface INote extends ITimestamped {
-	parent: IItem | ICollection;
+	parent: ItemDoc | CollectionDoc;
 	parentModel: ParentModelName;
 
-	item?: IItem;
-	parentCollection?: ICollection;
+	parentItem?: ItemDoc;
+	parentCollection?: CollectionDoc;
 
 	text: string;
 }
@@ -20,6 +20,7 @@ interface INoteMethods {
 }
 
 type NoteModel = Model<INote, {}, INoteMethods>;
+export type NoteDoc = Doc<INote, INoteMethods>;
 
 const noteSchema = new Schema<INote, NoteModel, INoteMethods>(
 	{
@@ -46,7 +47,7 @@ const noteSchema = new Schema<INote, NoteModel, INoteMethods>(
 
 noteSchema.index({ parent: 1 });
 
-noteSchema.virtual('item', {
+noteSchema.virtual('parentItem', {
 	ref: 'Item',
 	localField: 'parent',
 	foreignField: '_id',
@@ -61,7 +62,7 @@ noteSchema.virtual('parentCollection', {
 });
 
 noteSchema.methods.populateReference = async function (): Promise<void> {
-	await this.populate(this.parentModel);
+	await this.populate(this[this.parentModel]);
 	this.parent = this[this.parentModel];
 };
 
