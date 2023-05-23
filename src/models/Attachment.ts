@@ -7,7 +7,7 @@ interface IAttachment extends ITimestamped {
 	parent: ItemDoc;
 	name: string;
 	type: ATypeDoc;
-	path: string;
+	filename: string;
 }
 
 interface IAttachmentsMethods {
@@ -25,6 +25,7 @@ const attachmentSchema = new Schema<
 	{
 		parent: {
 			type: Types.ObjectId,
+			ref: 'Item',
 			required: [true, 'should be attachment']
 		},
 		name: {
@@ -36,7 +37,7 @@ const attachmentSchema = new Schema<
 			ref: 'AttachmentType',
 			required: [true, 'the type should be known']
 		},
-		path: {
+		filename: {
 			type: String,
 			required: [true, 'should refer to a file']
 		}

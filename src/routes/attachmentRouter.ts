@@ -20,8 +20,6 @@ router
 		controller.queuePopulateField.parent,
 		controller.getOne,
 		AttachmentController.authorizeEdit,
-		fileController.uploadFile,
-		fileController.addFilePath('path'),
 		controller.validateBody.patch,
 		controller.patchById,
 		controller.sendResponse('patch')
@@ -43,7 +41,7 @@ router
 	.post(
 		ItemController.authorizeEdit,
 		fileController.uploadFile,
-		fileController.addFilePath('path'),
+		fileController.addFileName('filename'),
 		controller.addItemToBody,
 		controller.validateBody.create,
 		controller.createOne,
