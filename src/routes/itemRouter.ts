@@ -52,7 +52,7 @@ router
 		controller.sendResponse('delete')
 	);
 
-// will have req.collection and will be checked for view access
+/* will have req.collection and will be checked for view access */
 router.use(controller.allowChildRouter);
 
 router
