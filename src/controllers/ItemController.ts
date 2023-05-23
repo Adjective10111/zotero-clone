@@ -39,17 +39,19 @@ export default class ItemController extends Controller<typeof Item> {
 
 	bodyKeys = {
 		create: {
-			allowed: ['metadata', 'tag', 'related'],
-			mandatory: [
-				'name',
-				'library',
-				'primaryAttachment',
-				'itemType',
-				'parentCollection'
-			]
+			allowed: ['primaryAttachment', 'itemType', 'metadata', 'tag', 'related'],
+			mandatory: ['name', 'library', 'parentCollection']
 		},
 		patch: {
-			allowed: ['name', 'parentCollection', 'metadata', 'related', 'tag']
+			allowed: [
+				'name',
+				'parentCollection',
+				'primaryAttachment',
+				'itemType',
+				'metadata',
+				'related',
+				'tag'
+			]
 		}
 	};
 	validateBody = {
