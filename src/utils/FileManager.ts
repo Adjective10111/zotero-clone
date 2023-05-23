@@ -106,6 +106,10 @@ export default class FileManager {
 		await fs.rename(`${path}/${prevName}`, `${path}/${newName}`);
 	}
 
+	static async deleteFile(path: string) {
+		await fs.rm(path);
+	}
+
 	/**
 	 * resizes and saves the image in memory by the specified qualities
 	 * if no resizeObject is specified, a general profile editor will be used
