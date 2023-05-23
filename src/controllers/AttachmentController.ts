@@ -27,9 +27,6 @@ export default class AttachmentController extends Controller<
 	};
 
 	bodyKeys = {
-		createBeforePath: {
-			mandatory: ['parent', 'name', 'type']
-		},
 		create: {
 			mandatory: ['parent', 'name', 'type', 'path']
 		},
@@ -41,27 +38,21 @@ export default class AttachmentController extends Controller<
 		create: this.preventMaliciousBody(this.bodyKeys.create),
 		patch: this.preventMaliciousBody(this.bodyKeys.patch),
 		itemCreator: (req: IRequest, res: Response, next: NextFunction) => {
-			this.preventMaliciousBody(this.bodyKeys.createBeforePath)(
-				req,
-				res,
-				err => {
-					if (err) return next(err);
+			this.preventMaliciousBody(this.bodyKeys.create)(req, res, err => {
+				if (err) return next(err);
 
-					if (typeof req.body.parent === 'object') {
-						let allowed = ['metadata', 'tag', 'related'];
-						let mandatory = ['name'];
-						allowed = allowed.concat(mandatory);
-						if (
-							mandatory.every(value => req.body.parent[value]) &&
-							Object.keys(req.body.parent).every(value =>
-								allowed.includes(value)
-							)
-						)
-							next();
-						else next(createError(400, 'invalid body'));
-					} else next(createError(400, 'invalid body'));
-				}
-			);
+				if (typeof req.body.parent === 'object') {
+					let allowed = ['metadata', 'tag', 'related'];
+					let mandatory = ['name'];
+					allowed = allowed.concat(mandatory);
+					if (
+						mandatory.every(value => req.body.parent[value]) &&
+						Object.keys(req.body.parent).every(value => allowed.includes(value))
+					)
+						next();
+					else next(createError(400, 'invalid body'));
+				} else next(createError(400, 'invalid body'));
+			});
 		}
 	};
 
@@ -93,7 +84,8 @@ export default class AttachmentController extends Controller<
 	}
 
 	isParentCollections(req: IRequest): boolean {
-		return req.originalUrl.split('/')[1] === 'collections';
+		// '' 'api' 'collections' ...
+		return req.originalUrl.split('/')[2] === 'collections';
 	}
 
 	async createItemByParentObj(
