@@ -14,8 +14,8 @@ router.use(
 	collectionRouter
 );
 
-// TODO: complete sync
-router.route('/sync').get().post().patch().delete();
+// // TODO: complete sync
+// router.route('/sync').get().post().patch().delete();
 
 router
 	.route('/')
@@ -27,6 +27,7 @@ router
 	.post(
 		controller.validateBody.create,
 		controller.createOne,
+		controller.initializeLibrary,
 		controller.sendResponse('create')
 	);
 router
