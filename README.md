@@ -6,6 +6,26 @@ It also provides an API for information fetching, citation, bibliography, advanc
 
 ## API
 
+### Routes
+
+#### users
+
+#### groups
+
+#### libraries
+
+#### collections
+
+#### items
+
+#### attachments
+
+#### notes
+
+#### attachmentTypes
+
+### Features
+
 The list of the features is as follows:
 
 - Account management
@@ -24,3 +44,4 @@ The list of the features is as follows:
 ## Session todo
 
 - tag performance
+- api calls for metadata fetching
