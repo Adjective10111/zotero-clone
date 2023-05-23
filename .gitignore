@@ -1,6 +1,7 @@
 .vscode/
 node_modules/
 src/public/*/*
+src/private/*
 temp/
 *.env
 *.bak
