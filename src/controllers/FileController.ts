@@ -17,19 +17,14 @@ export default class FileController {
 			new FileManager(
 				'any',
 				FileManager.createDiskStorage(
-					(req: IRequest, file) => {
-						let parentId = req.attachment?.parent;
-						if (!req.attachment) parentId = req.body.parent;
-						return `${__dirname}/../private/${parentId}`;
-					},
+					(req: IRequest, file) => `${__dirname}/../private`,
 					(req: IRequest, file) => {
 						let attachment = req.attachment;
 						if (!req.attachment) attachment = req.body;
+						const extension = file.originalname.split('.').pop();
 
-						const itemId = `${attachment.type}-${attachment.name}`;
-						req.filePath = `${attachment.parent}/${itemId}`;
-
-						return `${__dirname}/../private/${req.filePath}`;
+						req.filePath = `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
+						return `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
 					}
 				)
 			)
@@ -105,5 +100,17 @@ export default class FileController {
 			req.body[bodyKey] = req.file.path;
 			next();
 		};
+	}
+
+	addFileName(bodyKey: string) {
+		return (req: IRequest, res: Response, next: NextFunction) => {
+			if (!req.file) return next();
+			req.body[bodyKey] = req.file.filename;
+			next();
+		};
+	}
+
+	static async deleteFile(filename: string) {
+		await FileManager.deleteFile(`${__dirname}/../private/${filename}`);
 	}
 }
