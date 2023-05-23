@@ -19,8 +19,11 @@ interface ResizeObject {
 
 const fileFilter = {
 	any: (req: Request, file: File, cb: FileFilterCallback) => {
-		if (!file) cb(createError(400, 'No File Found'));
-		else cb(null, true);
+		if (file.mimetype) {
+			cb(null, true);
+		} else {
+			cb(createError(400, 'Not supported'));
+		}
 	},
 	image: (req: Request, file: File, cb: FileFilterCallback) => {
 		if (file.mimetype.startsWith('image')) {
@@ -47,17 +50,20 @@ export default class FileManager {
 	constructor(filterKey: FileFilterKey, storage: StorageEngine);
 	constructor(filterKey: FileFilterKey, dest: string);
 	constructor(filterKey: FileFilterKey, savior: StorageEngine | string) {
+		let filter: FileFilter = fileFilter[filterKey];
+		if (filterKey === 'any') filter = undefined;
+
 		if (typeof savior === 'string') {
 			this.path = savior;
 
 			this.uploader = multer({
 				dest: savior,
-				fileFilter: fileFilter[filterKey]
+				fileFilter: filter
 			});
 		} else
 			this.uploader = multer({
 				storage: savior,
-				fileFilter: fileFilter[filterKey]
+				fileFilter: filter
 			});
 	}
 
