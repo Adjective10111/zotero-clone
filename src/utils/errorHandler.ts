@@ -37,7 +37,7 @@ const modifyError = (err: any) => {
 };
 
 const sendError = (err: errorFactory.OperationalError, res: Response) => {
-	console.error(`> ${err.name}: ${err.message}`);
+	console.error(`> ${err.name}: ${err.message}\n${err.stack}`);
 
 	if (process.env.NODE_ENV === 'dev')
 		return res.status(err.statusCode).json({
