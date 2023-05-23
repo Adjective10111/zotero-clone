@@ -2,7 +2,6 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { Schema } from 'mongoose';
 import validator from 'validator';
-import { type NumericString } from './types';
 
 //#region user
 /**
@@ -15,7 +14,6 @@ export interface genericUser {
 	profile?: string;
 	name: string;
 	email: string;
-	// mobile?: NumericString | string;
 	password?: string;
 	role?: string;
 
@@ -76,13 +74,13 @@ export interface passwordManagementMethods {
 }
 
 export const passwordManagement = (schema: Schema): void => {
-	// control password changes
+	/* control password changes */
 	schema.pre('save', async function (next) {
 		if (!this.isModified('password')) return next();
 
 		this.password = await bcrypt.hash(this.password, 12);
-		// sets the allowedSessions as one second before termination has been done
-		// and saves it by seconds, NOT milliseconds
+		/* sets the allowedSessions as one second before termination has been done
+			and saves it by seconds, NOT milliseconds */
 		this.allowedSessionsAfter = Date.now() / 1000 - 1;
 
 		next();
@@ -96,10 +94,10 @@ export const passwordManagement = (schema: Schema): void => {
 	};
 
 	schema.methods.changePassword = async function (newPass: string) {
-		// change password
+		/* change password */
 		this.password = newPass;
 		await this.save();
-		// remove password from output
+		/* remove password from output */
 		this.password = undefined;
 	};
 

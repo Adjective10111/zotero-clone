@@ -36,7 +36,7 @@ class QueryHandler<DocType> {
 				};
 			}, {});
 
-		// advanced filtering: Support for operators
+		/* advanced filtering: Support for operators */
 		filterQuery = JSON.parse(
 			JSON.stringify(filterQuery).replace(
 				/\b(gte|gt|lte|lt)\b/g,
@@ -321,7 +321,7 @@ export default abstract class Controller<DocType extends Model<any>> {
 			const id = req.params.id;
 
 			let query = this.model.findById(id);
-			// populate if needed
+			/* populate if needed */
 			if (req.populateArray) {
 				req.populateArray.forEach(populateOptions => {
 					query = query.populate(populateOptions);

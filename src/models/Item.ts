@@ -63,7 +63,6 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 			default: () => ({})
 		},
 
-		// populate('related.item')
 		related: {
 			type: [
 				{

@@ -125,7 +125,7 @@ export default class FileManager {
 		file.filename = fileFullPath.split('/')[-1];
 		const { resize = [500, 500], quality = 90, format = 'jpeg' } = resizeObject;
 
-		// @ts-ignore
+		/* @ts-ignore */
 		await sharp(file.buffer)
 			.resize(...resize)
 			.toFormat(format)

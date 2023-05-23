@@ -1,9 +1,7 @@
 import { NextFunction, Response } from 'express';
-import { Types } from 'mongoose';
-import Item from '../models/Item';
 import Note, { NoteDoc } from '../models/Note';
 import Controller from '../utils/Controller';
-import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
+import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 
 interface INRequest extends IRequest {

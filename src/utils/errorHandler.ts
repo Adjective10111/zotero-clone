@@ -25,14 +25,14 @@ const handleValidationErrorDB = (err: any) => {
 };
 
 const modifyError = (err: any) => {
-	// database
+	/* database */
 	if (err.code === 11000) return handleDuplicateFieldsDB(err);
 	if (err.name === 'CastError') return handleCastErrorDB(err);
 	if (err.name === 'ValidationError') return handleValidationErrorDB(err);
-	// JWT
+	/* JWT */
 	if (err.name === 'JsonWebTokenError') return handleJWTError();
 	if (err.name === 'TokenExpiredError') return handleJWTExpiredError();
-	// unknown
+	/* unknown */
 	return err;
 };
 

@@ -3,7 +3,6 @@ import { Types } from 'mongoose';
 import Group, { GroupDoc } from '../models/Group';
 import { LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
-import { isEmpty } from '../utils/basicFunctions';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 

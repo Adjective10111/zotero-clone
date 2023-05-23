@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import { promisify } from 'util';
-import { catchAsync, createError, wrapAsync } from './errorFactory';
+import { catchAsync, createError } from './errorFactory';
 import { genericUser } from './schemaFactory';
 import { Cookie, Doc, IRequest, type IDed } from './types';
 

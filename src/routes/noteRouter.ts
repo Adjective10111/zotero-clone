@@ -30,7 +30,7 @@ router
 		controller.sendResponse('delete')
 	);
 
-// will have req.item or req.collection and will be checked for view access
+/* will have req.item or req.collection and will be checked for view access */
 router.use(controller.allowChildRouter);
 
 router

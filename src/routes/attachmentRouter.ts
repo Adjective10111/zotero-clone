@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import AttachmentController from '../controllers/AttachmentController';
-import CollectionController from '../controllers/CollectionController';
 import FileController from '../controllers/FileController';
 import ItemController from '../controllers/ItemController';
 
@@ -32,7 +31,7 @@ router
 		controller.sendResponse('delete')
 	);
 
-// will have req.item and will be checked for view access
+/* will have req.item and will be checked for view access */
 router.use(controller.allowChildRouter);
 
 router

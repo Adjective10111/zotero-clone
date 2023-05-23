@@ -29,7 +29,7 @@ interface ILibraryMethods {
 export type LibraryDoc = Doc<ILibrary, ILibraryMethods>;
 type LibraryModel = Model<ILibrary, {}, ILibraryMethods>;
 
-// private -> private ; !private && group -> publicView ; !private && !group -> publicFullAccess
+/* private -> private ; !private && group -> publicView ; !private && !group -> publicFullAccess */
 const librarySchema = new Schema<ILibrary, LibraryModel, ILibraryMethods>(
 	{
 		owner: {

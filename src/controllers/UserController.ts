@@ -4,7 +4,7 @@ import User, { UserDoc } from '../models/User';
 import Authenticator from '../utils/Authenticator';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
-import { Doc, type IRequest } from '../utils/types';
+import { type IRequest } from '../utils/types';
 
 type URequest = IRequest<UserDoc>;
 
@@ -83,7 +83,6 @@ export default class UserController extends Controller<typeof User> {
 		const user = await User.findOne({ email }).select('+password');
 		if (!user || !(await user.checkPassword(password)))
 			return next(createError(400, 'incorrect credentials'));
-		// remove password from output
 		user.password = undefined;
 
 		const cookieAndOptions = Authenticator.createCustomCookie(

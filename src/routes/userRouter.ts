@@ -25,19 +25,6 @@ router.post(
 );
 router.delete('/logout', controller.logout, controller.sendResponse('logout'));
 
-// router.post(
-// 	'/resetPassword',
-// 	controller.validateBody.resetToken,
-// 	controller.generateResetToken
-// 	// sendEmail
-// );
-// router.patch(
-// 	'/resetPassword/:token',
-// 	controller.validateBody.resetPassword,
-// 	controller.resetPassword,
-// 	controller.sendResponse('patch')
-// );
-
 router.use(UserController.authenticate);
 
 router

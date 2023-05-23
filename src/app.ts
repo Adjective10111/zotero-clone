@@ -1,12 +1,10 @@
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import path from 'path';
-//import xss from 'xss-clean';
 
 import apiRouter from './routes/apiRouter';
 import Controller from './utils/Controller';
@@ -14,8 +12,7 @@ import errorHandler from './utils/errorHandler';
 
 const app = express();
 
-// security middlewares
-//app.use(xss());
+/* security middlewares */
 app
 	.use(helmet())
 	.use(mongoSanitize())
@@ -28,17 +25,17 @@ app
 		})
 	);
 
-// request and response modifiers
+/* request and response modifiers */
 app
 	.use(express.json({ limit: '10kb' }))
 	.use(express.urlencoded({ extended: true, limit: '10kb' }))
 	.use(cookieParser())
 	.use(compression());
 
-// open-access folder for files
+/* open-access folder for files */
 app.use(express.static(`${__dirname}/public`));
 
-// add dev middlewares
+/* add dev middlewares */
 if (process.env.NODE_ENV === 'dev') {
 	app.use(morgan('dev'));
 }

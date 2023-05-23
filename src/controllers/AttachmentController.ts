@@ -1,7 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { Types } from 'mongoose';
 import Attachment, { AttachmentDoc } from '../models/Attachment';
-import Item from '../models/Item';
 import Controller from '../utils/Controller';
 import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
@@ -68,7 +66,6 @@ export default class AttachmentController extends Controller<
 	}
 
 	isParentCollections(req: IRequest): boolean {
-		// '' 'api' 'collections' ...
 		return req.originalUrl.split('/')[2] === 'collections';
 	}
 
