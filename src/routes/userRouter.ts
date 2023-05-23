@@ -14,7 +14,6 @@ router.post(
 	controller.removeField.password,
 	fileController.resizeProfile,
 	fileController.addFilePath('profile'),
-	controller.debugLog,
 	controller.createOne,
 	controller.sendResponse('create')
 );
@@ -32,12 +31,12 @@ router.delete('/logout', controller.logout, controller.sendResponse('logout'));
 // 	controller.generateResetToken
 // 	// sendEmail
 // );
-router.patch(
-	'/resetPassword/:token',
-	controller.validateBody.resetPassword,
-	controller.resetPassword,
-	controller.sendResponse('patch')
-);
+// router.patch(
+// 	'/resetPassword/:token',
+// 	controller.validateBody.resetPassword,
+// 	controller.resetPassword,
+// 	controller.sendResponse('patch')
+// );
 
 router.use(UserController.authenticate);
 
