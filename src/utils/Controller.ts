@@ -139,6 +139,19 @@ export default abstract class Controller<DocType extends Model<any>> {
 		};
 	}
 
+	filterBy(schemaKey: string, requestKey: string[]) {
+		return function (req: IFilterRequest, res: Response, next: NextFunction) {
+			let keyValue = req;
+			requestKey.forEach(value => (keyValue = keyValue[value]));
+			req.defaultFilter = {
+				...(req.defaultFilter || {}),
+				[schemaKey]: keyValue
+			};
+
+			next();
+		};
+	}
+
 	createRemoveFieldsObject(...fields: string[]) {
 		return function (
 			req: IRemoveFieldsRequest,

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import CollectionController from '../controllers/CollectionController';
 import LibraryController from '../controllers/LibraryController';
-import attachmentRouter from './attachmentRouter';
 import itemRouter from './itemRouter';
 import noteRouter from './noteRouter';
 
@@ -14,6 +13,7 @@ router.use(
 	controller.getOne,
 	controller.removePopulateArray,
 	CollectionController.authorizeView,
+	controller.filterBy('parentCollection', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	itemRouter
 );
@@ -23,6 +23,7 @@ router.use(
 	controller.getOne,
 	controller.removePopulateArray,
 	CollectionController.authorizeView,
+	controller.filterBy('parent', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	noteRouter
 );

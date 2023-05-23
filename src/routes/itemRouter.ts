@@ -12,6 +12,7 @@ router.use(
 	controller.getOne,
 	controller.removePopulateArray,
 	ItemController.authorizeView,
+	controller.filterBy('parent', ['item', '_id']),
 	controller.useAsParentParam('id'),
 	attachmentRouter
 );
@@ -21,6 +22,7 @@ router.use(
 	controller.getOne,
 	controller.removePopulateArray,
 	ItemController.authorizeView,
+	controller.filterBy('parent', ['item', '_id']),
 	controller.useAsParentParam('id'),
 	noteRouter
 );

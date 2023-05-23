@@ -100,7 +100,7 @@ collectionSchema.index({ name: 1, parent: 1 }, { unique: true });
 
 collectionSchema.virtual('items', {
 	ref: 'Item',
-	foreignField: 'parent',
+	foreignField: 'parentCollection',
 	localField: '_id'
 });
 

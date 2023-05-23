@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import CollectionController from '../controllers/CollectionController';
-import FileController from '../controllers/FileController';
 import ItemController from '../controllers/ItemController';
 import NoteController from '../controllers/NoteController';
 

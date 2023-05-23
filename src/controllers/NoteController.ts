@@ -68,13 +68,12 @@ export default class NoteController extends Controller<typeof Note> {
 		next: NextFunction
 	) {
 		if (req.note?.parentModel === 'parentItem') {
-			await req.attachment?.parentItem.populate('library');
-			if (await req.attachment?.parentItem.library?.canEdit(req.user?.id))
-				next();
+			await req.note?.parentItem?.populate('library');
+			if (await req.note?.parentItem?.library?.canEdit(req.user?.id)) next();
 			else next(createError(403, 'unauthorized'));
 		} else {
-			await req.attachment?.parentCollection.populate('parent');
-			if (await req.attachment?.parentCollection.parent?.canEdit(req.user?.id))
+			await req.note?.parentCollection?.populate('parent');
+			if (await req.note?.parentCollection?.parent?.canEdit(req.user?.id))
 				next();
 			else next(createError(403, 'unauthorized'));
 		}
@@ -86,19 +85,18 @@ export default class NoteController extends Controller<typeof Note> {
 		next: NextFunction
 	) {
 		if (req.note?.parentModel === 'parentItem') {
-			await req.attachment?.parentItem.populate('library');
-			if (await req.attachment?.parentItem.library?.canView(req.user?.id))
-				next();
+			await req.note?.parentItem?.populate('library');
+			if (await req.note?.parentItem?.library?.canView(req.user?.id)) next();
 			else next(createError(403, 'unauthorized'));
 		} else {
-			await req.attachment?.parentCollection.populate('parent');
-			if (await req.attachment?.parentCollection.parent?.canView(req.user?.id))
+			await req.note?.parentCollection?.populate('parent');
+			if (await req.note?.parentCollection?.parent?.canView(req.user?.id))
 				next();
 			else next(createError(403, 'unauthorized'));
 		}
 	}
 
 	isParentCollections(req: IRequest): boolean {
-		return req.originalUrl.split('/')[1] === 'collections';
+		return req.originalUrl.split('/')[2] === 'collections';
 	}
 }

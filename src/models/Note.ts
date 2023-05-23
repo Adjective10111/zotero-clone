@@ -62,7 +62,7 @@ noteSchema.virtual('parentCollection', {
 });
 
 noteSchema.methods.populateReference = async function (): Promise<void> {
-	await this.populate(this[this.parentModel]);
+	await this.populate(this.parentModel);
 	this.parent = this[this.parentModel];
 };
 
