@@ -18,15 +18,6 @@ router.use(
 	itemRouter
 );
 router.use(
-	'/:id/attachments',
-	controller.queuePopulateField.parent,
-	controller.getOne,
-	controller.removePopulateArray,
-	CollectionController.authorizeView,
-	controller.useAsParentParam('id'),
-	attachmentRouter
-);
-router.use(
 	'/:id/notes',
 	controller.queuePopulateField.parent,
 	controller.getOne,

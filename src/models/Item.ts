@@ -16,7 +16,7 @@ export interface IItem extends ITimestamped {
 	parentCollection: Doc<ICollection> | Types.ObjectId;
 
 	name: string;
-	primaryAttachment: AttachmentDoc;
+	primaryAttachment?: AttachmentDoc;
 	itemType?: ATypeDoc;
 	metadata?: object;
 
@@ -43,8 +43,7 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 		},
 		parentCollection: {
 			type: Types.ObjectId,
-			ref: 'Collection',
-			required: [true, 'must belong to a collection']
+			ref: 'Collection'
 		},
 
 		name: {
@@ -53,13 +52,11 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 		},
 		primaryAttachment: {
 			type: Types.ObjectId,
-			ref: 'Attachment',
-			required: [true, "must represent an attachment's metadata"]
+			ref: 'Attachment'
 		},
 		itemType: {
 			type: Types.ObjectId,
-			ref: 'AttachmentType',
-			default: 'unknown'
+			ref: 'AttachmentType'
 		},
 		metadata: {
 			type: Object,
@@ -127,7 +124,8 @@ itemSchema.methods.relate = async function (
 };
 
 itemSchema.pre('save', function (next) {
-	if (this.isNew) this.itemType = this.primaryAttachment.type;
+	if (this.modifiedPaths().includes('primaryAttachment'))
+		this.itemType = this.primaryAttachment?.type;
 	next();
 });
 

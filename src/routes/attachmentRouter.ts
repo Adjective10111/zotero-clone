@@ -5,8 +5,8 @@ import FileController from '../controllers/FileController';
 import ItemController from '../controllers/ItemController';
 
 const router = Router();
-const fileController = FileController.createFileController();
 const controller = new AttachmentController();
+const fileController = FileController.createFileController();
 
 router
 	.route('/:id')
@@ -41,22 +41,10 @@ router
 	.route('/')
 	.get(controller.getAll, controller.sendResponse('getAll'))
 	.post(
-		controller.condition({
-			if: [controller.isParentCollections],
-			then: [
-				CollectionController.authorizeEdit,
-				fileController.uploadFile,
-				fileController.addFilePath('path'),
-				controller.validateBody.itemCreator,
-				controller.createItemByParentObj
-			],
-			else: [
-				ItemController.authorizeEdit,
-				fileController.uploadFile,
-				fileController.addFilePath('path'),
-				controller.addItemToBody
-			]
-		}),
+		ItemController.authorizeEdit,
+		fileController.uploadFile,
+		fileController.addFilePath('path'),
+		controller.addItemToBody,
 		controller.validateBody.create,
 		controller.createOne,
 		controller.sendResponse('create')
