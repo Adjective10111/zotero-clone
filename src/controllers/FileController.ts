@@ -20,16 +20,16 @@ export default class FileController {
 					(req: IRequest, file) => {
 						let parentId = req.attachment?.parent;
 						if (!req.attachment) parentId = req.body.parent;
-						return `${__dirname}/private/${parentId}`;
+						return `${__dirname}/../private/${parentId}`;
 					},
 					(req: IRequest, file) => {
 						let attachment = req.attachment;
 						if (!req.attachment) attachment = req.body;
 
 						const itemId = `${attachment.type}-${attachment.name}`;
-						req.path = `${attachment.parent}/${itemId}`;
+						req.filePath = `${attachment.parent}/${itemId}`;
 
-						return `${__dirname}/private/${req.path}`;
+						return `${__dirname}/../private/${req.filePath}`;
 					}
 				)
 			)
