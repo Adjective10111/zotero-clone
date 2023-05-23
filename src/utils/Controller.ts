@@ -1,7 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Model, PopulateOptions, Query, QueryOptions } from 'mongoose';
 import { isEmpty } from './basicFunctions';
-import { OperationalError, catchAsync, createError } from './errorFactory';
+import { catchAsync, createError } from './errorFactory';
 import {
 	BodyValidationKeys,
 	CRUD,
@@ -99,8 +99,8 @@ export default abstract class Controller<DocType extends Model<any>> {
 
 	debugLog(req: IRequest, res: Response, next: NextFunction) {
 		console.log(
-			`${Date.now()} - ${req.url} - ParamKeys: ${Object.keys(req.params)} - ${
-				req.isChildRouter
+			`${Date.now()} - ${req.filePath} - File: ${
+				req.file
 			} - BodyKeys: ${Object.keys(req.body)}`
 		);
 		console.log(req.originalUrl);
