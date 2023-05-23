@@ -5,6 +5,7 @@ import Item from '../models/Item';
 import Controller from '../utils/Controller';
 import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
+import FileController from './FileController';
 
 interface IARequest extends IRequest {
 	attachment?: AttachmentDoc;
@@ -28,7 +29,7 @@ export default class AttachmentController extends Controller<
 
 	bodyKeys = {
 		create: {
-			mandatory: ['parent', 'name', 'type', 'path']
+			mandatory: ['parent', 'name', 'type', 'filename']
 		},
 		patch: {
 			allowed: ['parent', 'name', 'type']
@@ -36,24 +37,7 @@ export default class AttachmentController extends Controller<
 	};
 	validateBody = {
 		create: this.preventMaliciousBody(this.bodyKeys.create),
-		patch: this.preventMaliciousBody(this.bodyKeys.patch),
-		itemCreator: (req: IRequest, res: Response, next: NextFunction) => {
-			this.preventMaliciousBody(this.bodyKeys.create)(req, res, err => {
-				if (err) return next(err);
-
-				if (typeof req.body.parent === 'object') {
-					let allowed = ['metadata', 'tag', 'related'];
-					let mandatory = ['name'];
-					allowed = allowed.concat(mandatory);
-					if (
-						mandatory.every(value => req.body.parent[value]) &&
-						Object.keys(req.body.parent).every(value => allowed.includes(value))
-					)
-						next();
-					else next(createError(400, 'invalid body'));
-				} else next(createError(400, 'invalid body'));
-			});
-		}
+		patch: this.preventMaliciousBody(this.bodyKeys.patch)
 	};
 
 	addItemToBody = this.moveReqKeyToBody('parent', 'item', 'id');
@@ -88,24 +72,6 @@ export default class AttachmentController extends Controller<
 		return req.originalUrl.split('/')[2] === 'collections';
 	}
 
-	async createItemByParentObj(
-		req: IRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		const itemBody = req.body.parent;
-		itemBody.library = req.collection?.library?.id;
-		itemBody.parentCollection = req.collection?.id;
-		itemBody.itemType = req.body.type;
-		itemBody.primaryAttachment = Types.ObjectId.generate();
-
-		req.item = await Item.create(itemBody);
-		req.body.parent = req.item.id;
-		req.putAsPrimaryAttachment = true;
-
-		next();
-	}
-
 	createOne = catchAsync(
 		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
 			const document = await this.model.create(req.body);
@@ -116,6 +82,19 @@ export default class AttachmentController extends Controller<
 
 			req[this.modelName] = document;
 
+			next();
+		}
+	);
+
+	deleteDocument = catchAsync(
+		async (
+			req: IARequest,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			if (!req.attachment) return next(createError(400, 'no attachment'));
+			await FileController.deleteFile(req.attachment.filename);
+			await req.attachment.deleteOne();
 			next();
 		}
 	);
