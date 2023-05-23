@@ -152,7 +152,7 @@ librarySchema.post(/find/, function (found: LibraryDoc[] | LibraryDoc) {
 			doc.removeDuplicateCollections();
 			return doc;
 		});
-	else found.removeDuplicateCollections();
+	else if (found) found.removeDuplicateCollections();
 });
 
 librarySchema.post('save', async function () {
