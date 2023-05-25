@@ -5,18 +5,17 @@ import {
 	passwordManagement,
 	type passwordManagementMethods
 } from '../utils/schemaFactory';
-import { Doc } from '../utils/types';
-
-interface BlackToken {
-	token: string;
-	expiration?: number;
-}
+import { BlackToken, Doc } from '../utils/types';
 
 interface IUser extends genericUser {
 	blackTokens: BlackToken[];
 }
 interface IUserMethods extends passwordManagementMethods {
-	addBlackToken: (token: string, expiration?: number) => Promise<void>;
+	addBlackToken: (
+		token: string,
+		issuedAt?: number,
+		expiration?: number
+	) => Promise<void>;
 }
 export type UserDoc = Doc<IUser, IUserMethods>;
 
@@ -67,9 +66,10 @@ passwordManagement(userSchema);
 
 userSchema.methods.addBlackToken = async function (
 	token: string,
+	issuedAt?: number,
 	expiration?: number
 ) {
-	this.blackTokens.push({ token, expiration });
+	this.blackTokens.push({ token, issuedAt, expiration });
 	this.blackTokens.filter((tObj: BlackToken) =>
 		!tObj.expiration ? true : tObj.expiration > Date.now()
 	);

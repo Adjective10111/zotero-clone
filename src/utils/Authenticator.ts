@@ -148,9 +148,13 @@ export default class Authenticator {
 
 			await (
 				req.user as typeof req.user & {
-					addBlackToken: (token: string, expiration?: number) => Promise<void>;
+					addBlackToken: (
+						token: string,
+						issuedAt?: number,
+						expiration?: number
+					) => Promise<void>;
 				}
-			).addBlackToken(token, decoded.exp);
+			).addBlackToken(token, decoded.iat, decoded.exp);
 		}
 		if (cookieName)
 			res.cookie(cookieName, 'loggedOut', {

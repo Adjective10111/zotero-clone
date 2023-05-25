@@ -9,6 +9,12 @@ import { type genericUser } from './schemaFactory';
 
 export type NumericString = `${number}`;
 
+export interface BlackToken {
+	token: string;
+	issuedAt?: number;
+	expiration?: number;
+}
+
 export type Decorator = (
 	target: any,
 	key: string,

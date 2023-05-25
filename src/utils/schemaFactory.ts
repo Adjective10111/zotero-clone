@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { Schema } from 'mongoose';
 import validator from 'validator';
+import { BlackToken } from './types';
 
 //#region user
 /**
@@ -128,6 +129,11 @@ export const passwordManagement = (schema: Schema): void => {
 	 */
 	schema.methods.terminateSessions = async function (): Promise<void> {
 		this.allowedSessionsAfter = Date.now() / 1000;
+		if (this.blackTokens) {
+			this.blackTokens.filter((tObj: BlackToken) =>
+				!tObj.issuedAt ? true : tObj.issuedAt > this.allowedSessionsAfter
+			);
+		}
 		await this.save();
 	};
 };

@@ -28,8 +28,6 @@ fetches the logo of group
 
 creates a new user
 
-body keys:
-
 - mandatory:
   - 'name': string
   - 'email': email
@@ -39,7 +37,7 @@ body keys:
   - 'role': don't need to set, they're all users for now
 
 #### POST /login
-<!-- todo bearer token should be implemented -->
+
 logs you in and returns a cookie and a bearer token
 
 - mandatory:
@@ -48,7 +46,28 @@ logs you in and returns a cookie and a bearer token
 
 #### DELETE /logout
 
-deletes the cookie and logs you out
+deletes the cookie, adds the token to the blacklist, and logs you out
+
+#### GET /me
+
+fetch the user itself
+
+#### PATCH /me
+
+patch the user
+
+- allowed:
+  - 'name': string
+  - 'profile': image file
+  - 'role': don't need to set, they're all users for now
+
+#### PATCH /changePassword
+
+changes the password
+
+- mandatory:
+  - 'currentPassword': string above 8 chars long
+  - 'newPassword': string above 8 chars long
 
 ### groups
 
