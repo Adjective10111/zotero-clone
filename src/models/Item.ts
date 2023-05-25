@@ -24,7 +24,7 @@ export interface IItem extends ITimestamped {
 	notes?: INote[];
 
 	related: ({ name: string; item: IItem } | IItem)[];
-	tag: ITag[];
+	tags: ITag[];
 }
 
 interface IItemMethods {
@@ -72,7 +72,7 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 			],
 			default: []
 		},
-		tag: {
+		tags: {
 			type: [
 				{
 					name: String,
@@ -92,7 +92,7 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 
 itemSchema.index({ parentCollection: 1, name: 1 }, { unique: true });
 itemSchema.index({ library: 1, name: 1 });
-itemSchema.index({ tag: 1 });
+itemSchema.index({ tags: 1 });
 
 itemSchema.virtual('attachments', {
 	ref: 'Attachment',

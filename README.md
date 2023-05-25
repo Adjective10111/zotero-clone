@@ -191,7 +191,7 @@ adds an item to the collection
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tag': TagObject - { name: string, color: string }
+  - 'tags': TagObject[] - { name: string, color: string }
   - 'related': Item[]
 
 #### `GET ../collections/{id}/items`
@@ -208,11 +208,11 @@ patch item
 
 - allowed:
   - 'name': string
-  - 'parentCollection': collection - will be set automatically
+  - 'parentCollection': collection
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tag': TagObject - { name: string, color: string }
+  - 'tags': TagObject[] - { name: string, color: string }
   - 'related': Item[]
 
 #### `DELETE /{id}`
@@ -293,8 +293,8 @@ fetch note
 patch note
 
 - allowed:
-  - 'parent': sets automatically
-  - 'parentModel': sets automatically
+  - 'parent': collection | item
+  - 'parentModel': 'parentCollection' | 'parentItem'
   - 'text': string
 
 #### `DELETE /{id}`
@@ -320,5 +320,5 @@ create new attachment type
 
 ## Session todo
 
-- tag performance
+- tags performance
 - api calls for metadata fetching

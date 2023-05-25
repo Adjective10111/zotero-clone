@@ -39,7 +39,7 @@ export default class ItemController extends Controller<typeof Item> {
 
 	bodyKeys = {
 		create: {
-			allowed: ['primaryAttachment', 'itemType', 'metadata', 'tag', 'related'],
+			allowed: ['primaryAttachment', 'itemType', 'metadata', 'tags', 'related'],
 			mandatory: ['name', 'library', 'parentCollection']
 		},
 		patch: {
@@ -50,7 +50,7 @@ export default class ItemController extends Controller<typeof Item> {
 				'itemType',
 				'metadata',
 				'related',
-				'tag'
+				'tags'
 			]
 		}
 	};
