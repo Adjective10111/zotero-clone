@@ -4,11 +4,15 @@ import app from './app';
 import * as serverShutter from './utils/serverShutter';
 
 //#region db connection
-const db = process.env.DATABASE_LOCAL || 'error';
+const db =
+	process.env.DATABASE?.replace(
+		'<PASSWORD>',
+		process.env.DATABASE_PASSWORD || 'error'
+	) ||
+	process.env.DATABASE_LOCAL ||
+	'error';
 
-mongoose
-	.connect(db)
-	.then(() => console.log('> DB connection successful!'));
+mongoose.connect(db).then(() => console.log('> DB connection successful!'));
 //#endregion
 
 // localhost:3000/api/
