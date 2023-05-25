@@ -4,6 +4,11 @@ It's a clone of zotero implemented by typescript and mongodb.
 This is the backend part of it for synchronization using accounts.
 It also provides an API for information fetching, citation, bibliography, advanced search and more.
 
+## Session todo
+
+- tags performance
+- api calls for metadata fetching
+
 ## Routes
 
 To access POSTMAN collection click on [link](https://college-312-dorm.postman.co/workspace/Zotero-clone~5f1d8efa-63a2-4c8c-9562-97de4253d81e/collection/22982170-812e4bea-eaeb-4375-b42d-844b4ed77645)
@@ -319,8 +324,3 @@ create new attachment type
   - 'metadataKeys': string[]
 - allowed:
   - 'icon': image file
-
-## Session todo
-
-- tags performance
-- api calls for metadata fetching
