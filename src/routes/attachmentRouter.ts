@@ -7,6 +7,15 @@ const router = Router();
 const controller = new AttachmentController();
 const fileController = FileController.createFileController();
 
+router.get(
+	'/:id/file',
+	controller.queuePopulateField.parent,
+	controller.getOne,
+	AttachmentController.authorizeView,
+	controller.addFileInfoToReq,
+	fileController.downloadFile
+);
+
 router
 	.route('/:id')
 	.get(

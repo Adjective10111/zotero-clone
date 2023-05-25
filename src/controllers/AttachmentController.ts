@@ -83,6 +83,12 @@ export default class AttachmentController extends Controller<
 		}
 	);
 
+	addFileInfoToReq(req: IARequest, res: Response, next: NextFunction) {
+		req.filePath = `${__dirname}/../private`;
+		req.filename = req.attachment?.filename;
+		next();
+	}
+
 	deleteDocument = catchAsync(
 		async (
 			req: IARequest,

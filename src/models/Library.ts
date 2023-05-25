@@ -81,6 +81,8 @@ librarySchema.virtual('collections', {
 });
 
 librarySchema.methods.initialize = async function (): Promise<void> {
+	if (!!this.unfiledItems) return;
+
 	const unfiledItems = await Collection.create({
 		parent: this.id,
 		name: 'unfiled items',
@@ -157,6 +159,12 @@ librarySchema.post(/find/, function (found: LibraryDoc[] | LibraryDoc) {
 
 librarySchema.post('save', async function () {
 	if (this.isNew) await this.initialize();
+	if (this.modifiedPaths().includes('group')) {
+		await this.populate('group');
+		if (!this.group) return;
+		this.owner = this.group?.owner;
+	}
+	await this.save();
 });
 
 const Library = model<ILibrary, LibraryModel>('Library', librarySchema);

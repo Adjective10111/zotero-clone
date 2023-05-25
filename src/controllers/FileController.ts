@@ -23,7 +23,7 @@ export default class FileController {
 						if (!req.attachment) attachment = req.body;
 						const extension = file.originalname.split('.').pop();
 
-						req.filePath = `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
+						req.filename = `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
 						return `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
 					}
 				)
@@ -80,7 +80,7 @@ export default class FileController {
 		async (req: IRequest, res: Response, next: NextFunction) => {
 			if (!req.file) return next();
 			const fileId = !req.attachmenttype
-				? `${req.body.name}`
+				? req.body.name
 				: req.attachmenttype.name;
 
 			req.file = await this.fileManager.resizeImage(

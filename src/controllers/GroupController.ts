@@ -13,7 +13,7 @@ export interface IGRequest extends IRequest {
 export default class GroupController extends Controller<typeof Group> {
 	bodyKeys = {
 		create: { allowed: ['logo', 'editors'], mandatory: ['name', 'owner'] },
-		patch: { allowed: ['name', 'editors', 'newEditors'] }
+		patch: { allowed: ['logo', 'name', 'editors', 'newEditors'] }
 	};
 	validateBody = {
 		create: this.preventMaliciousBody(this.bodyKeys.create),
