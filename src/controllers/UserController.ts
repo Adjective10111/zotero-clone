@@ -38,10 +38,10 @@ export default class UserController extends Controller<typeof User> {
 	bodyKeys = {
 		signUp: {
 			mandatory: ['name', 'email', 'password'],
-			allowed: ['photo', 'role']
+			allowed: ['profile', 'role']
 		},
 		login: { mandatory: ['email', 'password'] },
-		patch: { allowed: ['name', 'photo', 'role'] },
+		patch: { allowed: ['name', 'profile', 'role'] },
 		changePassword: { mandatory: ['currentPassword', 'newPassword'] },
 		resetToken: { mandatory: ['email'] },
 		resetPassword: { mandatory: ['newPassword'] }
@@ -68,7 +68,8 @@ export default class UserController extends Controller<typeof User> {
 	);
 	static authenticate = Authenticator.authenticate(
 		User,
-		UserController.userCookie
+		UserController.userCookie,
+		true
 	);
 
 	validateRoleValue(req: URequest, res: Response, next: NextFunction) {
@@ -92,14 +93,13 @@ export default class UserController extends Controller<typeof User> {
 		);
 
 		req.user = user;
-		res.cookie(...cookieAndOptions);
-		next();
-	}
-	logout(req: URequest, res: Response, next: NextFunction) {
-		res.cookie(UserController.userCookie, 'loggedOut', {
-			expires: new Date(Date.now() + 3000),
-			httpOnly: true
+		res.cookie(...cookieAndOptions).json({
+			status: 'successful',
+			token: cookieAndOptions[1]
 		});
+	}
+	async logout(req: URequest, res: Response, next: NextFunction) {
+		Authenticator.logout(true, req, res, UserController.userCookie);
 		next();
 	}
 

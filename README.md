@@ -4,42 +4,65 @@ It's a clone of zotero implemented by typescript and mongodb.
 This is the backend part of it for synchronization using accounts.
 It also provides an API for information fetching, citation, bibliography, advanced search and more.
 
-## API
+## Routes
 
-### Routes
+### public files
 
-#### users
+#### GET /profiles/{email}.jpg
 
-#### groups
+fetches the profile pic of users
+<!-- todo -->
+#### GET /icons/
 
-#### libraries
+fetches the attachment-type's icon
+<!-- todo -->
+#### GET /logos/
 
-#### collections
+fetches the logo of group
 
-#### items
+##### the APIs below are under /api route
 
-#### attachments
+### /users
 
-#### notes
+#### POST /signUp
 
-#### attachmentTypes
+creates a new user
 
-### Features
+body keys:
 
-The list of the features is as follows:
+- mandatory:
+  - 'name': string
+  - 'email': email
+  - 'password': string above 8 chars long
+- allowed:
+  - 'profile': image file
+  - 'role': don't need to set, they're all users for now
 
-- Account management
-- File Hierarchy Synchronization
-- Back-up files with their metadata
-- ID-based fetcher:
-  - ISBN
-  - DOI
-  - PMID
-  - arXiv ID
-  - ADS Bibcode
-- Collaboration
-- Advanced search with text-based searching capability
-- bibliography and citation creation
+#### POST /login
+<!-- todo bearer token should be implemented -->
+logs you in and returns a cookie and a bearer token
+
+- mandatory:
+  - 'email': email
+  - 'password': string above 8 chars long
+
+#### DELETE /logout
+
+deletes the cookie and logs you out
+
+### groups
+
+### libraries
+
+### collections
+
+### items
+
+### attachments
+
+### notes
+
+### attachment
 
 ## Session todo
 

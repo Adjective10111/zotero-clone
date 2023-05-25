@@ -7,8 +7,17 @@ import {
 } from '../utils/schemaFactory';
 import { Doc } from '../utils/types';
 
-interface IUser extends genericUser {}
-interface IUserMethods extends passwordManagementMethods {}
+interface BlackToken {
+	token: string;
+	expiration?: number;
+}
+
+interface IUser extends genericUser {
+	blackTokens: BlackToken[];
+}
+interface IUserMethods extends passwordManagementMethods {
+	addBlackToken: (token: string, expiration?: number) => Promise<void>;
+}
 export type UserDoc = Doc<IUser, IUserMethods>;
 
 type UserModel = Model<IUser, {}, IUserMethods>;
@@ -47,10 +56,25 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		type: Date,
 		select: false
 	},
-	allowedSessionsAfter: Number
+	allowedSessionsAfter: Number,
+	blackTokens: {
+		type: [Object],
+		default: []
+	}
 });
 
 passwordManagement(userSchema);
+
+userSchema.methods.addBlackToken = async function (
+	token: string,
+	expiration?: number
+) {
+	this.blackTokens.push({ token, expiration });
+	this.blackTokens.filter((tObj: BlackToken) =>
+		!tObj.expiration ? true : tObj.expiration > Date.now()
+	);
+	await this.save();
+};
 
 const User = model<IUser, UserModel>('User', userSchema);
 export default User;

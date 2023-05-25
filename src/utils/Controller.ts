@@ -408,7 +408,6 @@ export default abstract class Controller<DocType extends Model<any>> {
 					});
 					break;
 
-				case 'login':
 				case 'getOne':
 				case 'patch':
 					res.status(200).json({

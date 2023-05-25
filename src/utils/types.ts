@@ -28,7 +28,6 @@ export type CRUD =
 	| 'getOne'
 	| 'patch'
 	| 'delete'
-	| 'login'
 	| 'logout';
 
 export type Cookie = [string, string, CookieOptions];

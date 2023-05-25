@@ -28,16 +28,19 @@ export default class Authenticator {
 		} as { token: string; cookie: string };
 
 		const token = jwt.sign({ id }, process.env.JWT_SECRET as string, {
-			expiresIn: expiration.token
+			expiresIn: expiration.token === '0' ? undefined : expiration.token
 		});
 
 		return [
 			cookieName,
 			token,
 			{
-				expires: new Date(
-					Date.now() + parseInt(expiration.cookie) * 24 * 3600 * 1000
-				),
+				expires:
+					expiration.cookie === '0'
+						? undefined
+						: new Date(
+								Date.now() + parseInt(expiration.cookie) * 24 * 3600 * 1000
+						  ),
 				httpOnly: true,
 				secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
 			}
@@ -54,6 +57,7 @@ export default class Authenticator {
 		return token;
 	}
 	static async getUser(
+		hasTokenBlacklist: boolean,
 		req: IRequest,
 		UserModel: Model<genericUser & any>,
 		cookieName?: string
@@ -74,11 +78,17 @@ export default class Authenticator {
 		if (user.allowedSession && !user.allowedSession(decoded.iat))
 			throw createError(401, 'old session, login again');
 
+		if (hasTokenBlacklist) {
+			if (user.blackTokens.includes(token))
+				throw createError(401, 'invalid session, login again');
+		}
+
 		return user;
 	}
 	static caughtAuthenticate(
 		UserModel: Model<genericUser & any>,
-		cookieName?: string
+		cookieName?: string,
+		hasTokenBlacklist: boolean = false
 	) {
 		return catchAsync(async function (
 			req: IRequest,
@@ -86,7 +96,12 @@ export default class Authenticator {
 			next: NextFunction
 		) {
 			try {
-				const user = await Authenticator.getUser(req, UserModel, cookieName);
+				const user = await Authenticator.getUser(
+					hasTokenBlacklist,
+					req,
+					UserModel,
+					cookieName
+				);
 				req.user = user;
 			} catch (err) {}
 			next();
@@ -94,18 +109,54 @@ export default class Authenticator {
 	}
 	static authenticate(
 		UserModel: Model<genericUser & any>,
-		cookieName?: string
+		cookieName?: string,
+		hasTokenBlacklist: boolean = false
 	) {
 		return catchAsync(async function (
 			req: IRequest,
 			res: Response,
 			next: NextFunction
 		) {
-			const user = await Authenticator.getUser(req, UserModel, cookieName);
+			const user = await Authenticator.getUser(
+				hasTokenBlacklist,
+				req,
+				UserModel,
+				cookieName
+			);
 			req.user = user;
 
 			next();
 		});
+	}
+
+	static async logout(
+		hasTokenBlacklist: boolean,
+		req: IRequest,
+		res: Response,
+		cookieName?: string
+	) {
+		if (!req.user) throw createError(400, 'no user was logged in');
+
+		if (hasTokenBlacklist) {
+			const token = Authenticator.searchForAuthentication(req, cookieName);
+			if (!token) throw createError(401, 'login to continue');
+
+			const decoded = await (verifyJWT as Verifier)(
+				token,
+				process.env.JWT_SECRET as string
+			);
+
+			await (
+				req.user as typeof req.user & {
+					addBlackToken: (token: string, expiration?: number) => Promise<void>;
+				}
+			).addBlackToken(token, decoded.exp);
+		}
+		if (cookieName)
+			res.cookie(cookieName, 'loggedOut', {
+				expires: new Date(Date.now() + 3000),
+				httpOnly: true
+			});
 	}
 
 	static restrictTo(...roles: string[]) {

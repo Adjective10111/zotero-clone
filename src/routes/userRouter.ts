@@ -17,12 +17,7 @@ router.post(
 	controller.createOne,
 	controller.sendResponse('create')
 );
-router.post(
-	'/login',
-	controller.validateBody.login,
-	controller.login,
-	controller.sendResponse('login')
-);
+router.post('/login', controller.validateBody.login, controller.login);
 router.delete('/logout', controller.logout, controller.sendResponse('logout'));
 
 router.use(UserController.authenticate);
