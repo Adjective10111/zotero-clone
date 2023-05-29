@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { CookieOptions, NextFunction, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import { promisify } from 'util';
@@ -27,24 +27,23 @@ export default class Authenticator {
 					: process.env.JWT_COOKIE_EXPIRES_IN
 		} as { token: string; cookie: string };
 
-		const token = jwt.sign({ id }, process.env.JWT_SECRET as string, {
-			expiresIn: expiration.token === '0' ? undefined : expiration.token
-		});
+		let signOptions = undefined;
+		if (expiration.token !== '0') signOptions = { expiresIn: expiration.token };
+		const token = jwt.sign(
+			{ id },
+			process.env.JWT_SECRET as string,
+			signOptions
+		);
 
-		return [
-			cookieName,
-			token,
-			{
-				expires:
-					expiration.cookie === '0'
-						? undefined
-						: new Date(
-								Date.now() + parseInt(expiration.cookie) * 24 * 3600 * 1000
-						  ),
-				httpOnly: true,
-				secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
-			}
-		];
+		let resCookieOptions: CookieOptions = {
+			httpOnly: true,
+			secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+		};
+		if (expiration.cookie !== '0')
+			resCookieOptions['expires'] = new Date(
+				Date.now() + parseInt(expiration.cookie) * 24 * 3600 * 1000
+			);
+		return [cookieName, token, resCookieOptions];
 	}
 
 	static searchForAuthentication(req: IRequest, cookieName?: string) {
