@@ -1,5 +1,6 @@
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
@@ -14,6 +15,7 @@ const app = express();
 
 /* security middlewares */
 app
+	.use(cors())
 	.use(helmet())
 	.use(mongoSanitize())
 	.use(
