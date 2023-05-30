@@ -33,7 +33,7 @@ fetches the attachment-type's icon
 
 #### `POST /signUp`
 
-creates a new user
+creates a new user and returns a cookie and a bearer token
 
 - mandatory:
   - 'name': string
