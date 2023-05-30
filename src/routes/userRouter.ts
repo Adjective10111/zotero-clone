@@ -15,7 +15,7 @@ router.post(
 	fileController.resizeProfile,
 	fileController.addFilePath('profile'),
 	controller.createOne,
-	controller.sendResponse('create')
+	controller.login
 );
 router.post('/login', controller.validateBody.login, controller.login);
 router.delete('/logout', controller.logout, controller.sendResponse('logout'));
