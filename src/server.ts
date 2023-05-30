@@ -13,7 +13,14 @@ const db =
 	process.env.DATABASE_LOCAL ||
 	'error';
 
-mongoose.connect(db).then(() => console.log('> DB connection successful!'));
+let connectionOptions = {};
+if (db === process.env.DATABASE_LIARA)
+	connectionOptions = {
+		authSource: 'admin'
+	};
+mongoose
+	.connect(db, connectionOptions)
+	.then(() => console.log('> DB connection successful!'));
 //#endregion
 
 // localhost:3000/api/
