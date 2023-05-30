@@ -9,6 +9,7 @@ const db =
 		'<PASSWORD>',
 		process.env.DATABASE_PASSWORD || 'error'
 	) ||
+	process.env.DATABASE_LIARA ||
 	process.env.DATABASE_LOCAL ||
 	'error';
 
