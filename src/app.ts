@@ -9,15 +9,27 @@ import morgan from 'morgan';
 
 import apiRouter from './routes/apiRouter';
 import Controller from './utils/Controller';
+import { createError } from './utils/errorFactory';
 import errorHandler from './utils/errorHandler';
 
 const app = express();
+const whitelist: string[] = [];
 
 /* security middlewares */
 app
-	.use(cors())
 	.use(helmet())
 	.use(mongoSanitize())
+	.use(
+		cors({
+			origin: function (origin, callback) {
+				if (whitelist.length === 0 || whitelist.includes(origin || 'error'))
+					callback(null, true);
+				else callback(createError(401, 'unrecognizable origin'));
+			},
+			methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+			credentials: true
+		})
+	)
 	.use(
 		'/api',
 		rateLimit({
