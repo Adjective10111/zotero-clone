@@ -4,9 +4,7 @@
   "description": "a reference managing application used by researchers in articles and such",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node ./src/server.ts",
-    "start:dev": "nodemon ./src/server.ts -e ts",
-    "start:db": "sudo mongod --dbpath ~/data/db"
+    "start": "ts-node ./src/server.ts"
   },
   "keywords": [
     "zotero",
