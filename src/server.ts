@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config({ path: './.env' });
 import mongoose from 'mongoose';
 import app from './app';
 import * as serverShutter from './utils/serverShutter';
