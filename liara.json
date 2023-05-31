@@ -5,11 +5,11 @@
 	"disks": [
 		{
 			"name": "public",
-			"mountTo": "src/public"
+			"mountTo": "build/public"
 		},
 		{
 			"name": "private",
-			"mountTo": "src/private"
+			"mountTo": "build/private"
 		}
 	]
 }
