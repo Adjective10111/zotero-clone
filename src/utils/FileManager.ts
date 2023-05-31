@@ -110,6 +110,10 @@ export default class FileManager {
 		await fs.rm(path);
 	}
 
+	static async createDir(path: string) {
+		await fs.mkdir(path);
+	}
+
 	/**
 	 * resizes and saves the image in memory by the specified qualities
 	 * if no resizeObject is specified, a general profile editor will be used
