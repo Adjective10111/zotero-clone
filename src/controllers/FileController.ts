@@ -3,9 +3,8 @@ import FileManager from '../utils/FileManager';
 import { catchAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 
-FileManager.createDir('../private').then(() => console.log('created private'));
-FileManager.createDir('../public').then(async () => {
-	await FileManager.createDir('../public/icons');
+// FileManager.createDir('../private').then(() => console.log('created private'));
+FileManager.createDir('../public/icons').then(async () => {
 	await FileManager.createDir('../public/logos');
 	await FileManager.createDir('../public/profiles');
 	console.log('created public');
