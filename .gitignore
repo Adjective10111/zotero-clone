@@ -5,10 +5,11 @@ temp/
 *.env
 *.bak
 
-build/controllers
-build/models
-build/routes
-build/utils
-build/*.js
+build/*
+!build/public
+!build/public/*
 build/public/*/*
+!build/public/*/.mt
+!build/private
 build/private/*
+!build/private/.mt

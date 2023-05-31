@@ -3,12 +3,6 @@ import FileManager from '../utils/FileManager';
 import { catchAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
 
-// FileManager.createDir('../private').then(() => console.log('created private'));
-FileManager.createDir('../public/icons').then(async () => {
-	await FileManager.createDir('../public/logos');
-	await FileManager.createDir('../public/profiles');
-	console.log('created public');
-});
 export default class FileController {
 	constructor(private fileManager: FileManager) {}
 
