@@ -2,7 +2,7 @@
   "name": "zotero",
   "version": "1.0.0",
   "description": "a reference managing application used by researchers in articles and such",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
     "build": "tsc --build",
     "start": "node ./build/server.js"
@@ -32,8 +32,7 @@
     "multer": "^1.4.5-lts.1",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.1",
-    "validator": "^13.9.0",
-    "xss-clean": "^0.1.1"
+    "validator": "^13.9.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
