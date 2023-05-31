@@ -4,7 +4,8 @@
   "description": "a reference managing application used by researchers in articles and such",
   "main": "index.ts",
   "scripts": {
-    "start": "nodemon ./src/server.ts -e ts",
+    "start": "ts-node ./src/server.ts",
+    "start:dev": "nodemon ./src/server.ts -e ts",
     "start:db": "sudo mongod --dbpath ~/data/db"
   },
   "keywords": [
