@@ -9,7 +9,6 @@ import morgan from 'morgan';
 
 import apiRouter from './routes/apiRouter';
 import Controller from './utils/Controller';
-import { createError } from './utils/errorFactory';
 import errorHandler from './utils/errorHandler';
 
 const app = express();
