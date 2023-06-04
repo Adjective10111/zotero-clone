@@ -96,6 +96,7 @@ export default class UserController extends Controller<typeof User> {
 		res.cookie(...cookieAndOptions);
 		next();
 	}
+	@wrapAsync
 	async logout(req: URequest, res: Response, next: NextFunction) {
 		req.user = (await User.findById(req.user?.id).select(
 			'+blackTokens'
