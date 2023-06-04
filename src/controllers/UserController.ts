@@ -93,10 +93,8 @@ export default class UserController extends Controller<typeof User> {
 		);
 
 		req.user = user;
-		res.cookie(...cookieAndOptions).json({
-			status: 'successful',
-			token: cookieAndOptions[1]
-		});
+		res.cookie(...cookieAndOptions);
+		next();
 	}
 	async logout(req: URequest, res: Response, next: NextFunction) {
 		Authenticator.logout(true, req, res, UserController.userCookie);

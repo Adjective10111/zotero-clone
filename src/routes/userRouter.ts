@@ -15,9 +15,15 @@ router.post(
 	fileController.resizeProfile,
 	fileController.addFilePath('profile'),
 	controller.createOne,
-	controller.login
+	controller.login,
+	controller.sendResponse('login')
 );
-router.post('/login', controller.validateBody.login, controller.login);
+router.post(
+	'/login',
+	controller.validateBody.login,
+	controller.login,
+	controller.sendResponse('login')
+);
 router.delete('/logout', controller.logout, controller.sendResponse('logout'));
 
 router.use(UserController.authenticate);

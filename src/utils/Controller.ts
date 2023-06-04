@@ -424,6 +424,14 @@ export default abstract class Controller<DocType extends Model<any>> {
 					});
 					break;
 
+				case 'login':
+					res.status(200).json({
+						status: 'success',
+						token: req.token,
+						data: req[this.modelName]
+					});
+					break;
+
 				default:
 					res.status(200).json({
 						data: null
