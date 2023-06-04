@@ -78,7 +78,10 @@ export default class Authenticator {
 			throw createError(401, 'old session, login again');
 
 		if (hasTokenBlacklist) {
-			if (user.blackTokens.includes(token))
+			if (!user.blackTokens) {
+				user.blackTokens = [];
+				await user.save();
+			} else if (user.blackTokens.includes(token))
 				throw createError(401, 'invalid session, login again');
 		}
 
