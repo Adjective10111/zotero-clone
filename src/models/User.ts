@@ -58,7 +58,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 	allowedSessionsAfter: Number,
 	blackTokens: {
 		type: [Object],
-		default: []
+		default: [],
+		select: false
 	}
 });
 
