@@ -21,11 +21,7 @@ app
 	.use(mongoSanitize())
 	.use(
 		cors({
-			origin: function (origin, callback) {
-				if (whitelist.length === 0 || whitelist.includes(origin || 'error'))
-					callback(null, true);
-				else callback(createError(401, 'unrecognizable origin'));
-			},
+			origin: true,
 			methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 			credentials: true
 		})
