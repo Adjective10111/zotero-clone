@@ -49,7 +49,10 @@ export default class LibraryController extends Controller<typeof Library> {
 					req.body.owner = group.owner;
 				} else req.body.owner = req.user?.id;
 
-				this.preventMaliciousBody(this.bodyKeys.create)(req, res, next);
+				this.preventMaliciousBody(this.bodyKeys.create)(req, res, err => {
+					if (err) return next(err);
+					next();
+				});
 			}
 		),
 		patch: this.preventMaliciousBody(this.bodyKeys.patch)

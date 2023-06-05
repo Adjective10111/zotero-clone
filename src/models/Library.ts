@@ -21,7 +21,6 @@ interface ILibrary {
 interface ILibraryMethods {
 	initialize(this: Doc<ILibrary>): Promise<void>;
 	emptyBin(this: Doc<ILibrary>): Promise<void>;
-	removeDuplicateCollections(this: Doc<ILibrary>): void;
 	canEdit(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
 	canView(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
 }
@@ -72,7 +71,7 @@ const librarySchema = new Schema<ILibrary, LibraryModel, ILibraryMethods>(
 	}
 );
 
-librarySchema.index({ user: 1, name: 1 }, { unique: true });
+librarySchema.index({ owner: 1, name: 1 }, { unique: true });
 
 librarySchema.virtual('collections', {
 	ref: 'Collection',
@@ -112,15 +111,6 @@ librarySchema.methods.initialize = async function (): Promise<void> {
 librarySchema.methods.emptyBin = async function (): Promise<void> {
 	await (this.bin as CollectionDoc).empty();
 };
-librarySchema.methods.removeDuplicateCollections = function (): void {
-	if (!this.populated('collections')) return;
-
-	defaultCollectionNames.forEach(name => {
-		let index = this.collections?.findIndex(doc => doc.name === name);
-		if (index === undefined || index === -1) return;
-		this.collections?.splice(index, 1);
-	});
-};
 librarySchema.methods.canEdit = async function (
 	userId: Types.ObjectId
 ): Promise<boolean> {
@@ -148,23 +138,14 @@ librarySchema.methods.canView = async function (
 	return this.group?.has(userId) as boolean;
 };
 
-librarySchema.post(/find/, function (found: LibraryDoc[] | LibraryDoc) {
-	if (found instanceof Array)
-		found = found.map(doc => {
-			doc.removeDuplicateCollections();
-			return doc;
-		});
-	else if (found) found.removeDuplicateCollections();
-});
-
 librarySchema.post('save', async function () {
 	if (this.isNew) await this.initialize();
 	if (this.modifiedPaths().includes('group')) {
 		await this.populate('group');
 		if (!this.group) return;
 		this.owner = this.group?.owner;
+		await this.save();
 	}
-	await this.save();
 });
 
 const Library = model<ILibrary, LibraryModel>('Library', librarySchema);
