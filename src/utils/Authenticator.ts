@@ -36,8 +36,8 @@ export default class Authenticator {
 		);
 
 		let resCookieOptions: CookieOptions = {
-			httpOnly: true
-			// secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+			httpOnly: true,
+			secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
 		};
 		if (expiration.cookie !== '0')
 			resCookieOptions['expires'] = new Date(
