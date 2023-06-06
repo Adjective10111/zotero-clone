@@ -101,8 +101,18 @@ export default class UserController extends Controller<typeof User> {
 		req.user = (await User.findById(req.user?.id).select(
 			'+blackTokens'
 		)) as UserDoc;
-		Authenticator.logout(true, req, res, UserController.userCookie);
-		next();
+		Authenticator.logout(true, req, UserController.userCookie);
+
+		res
+			.status(204)
+			.cookie(UserController.userCookie, 'loggedOut', {
+				expires: new Date(Date.now() + 3000),
+				httpOnly: true
+			})
+			.json({
+				status: 'success',
+				data: null
+			});
 	}
 
 	@wrapAsync

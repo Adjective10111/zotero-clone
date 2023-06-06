@@ -134,7 +134,6 @@ export default class Authenticator {
 	static async logout(
 		hasTokenBlacklist: boolean,
 		req: IRequest,
-		res: Response,
 		cookieName?: string
 	) {
 		if (!req.user) throw createError(400, 'no user was logged in');
@@ -158,11 +157,6 @@ export default class Authenticator {
 				}
 			).addBlackToken(token, decoded.iat, decoded.exp);
 		}
-		if (cookieName)
-			res.cookie(cookieName, 'loggedOut', {
-				expires: new Date(Date.now() + 3000),
-				httpOnly: true
-			});
 	}
 
 	static restrictTo(...roles: string[]) {

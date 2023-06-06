@@ -27,7 +27,7 @@ router.post(
 
 router.use(UserController.authenticate);
 
-router.delete('/logout', controller.logout, controller.sendResponse('logout'));
+router.delete('/logout', controller.logout);
 router
 	.route('/me')
 	.get(controller.sendResponse('getOne'))
