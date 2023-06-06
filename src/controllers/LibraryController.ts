@@ -96,7 +96,7 @@ export default class LibraryController extends Controller<typeof Library> {
 	async deleteCollections(req: ILRequest, res: Response, next: NextFunction) {
 		await req.library?.collections?.forEach(async collection => {
 			if (Collection.isCollection(collection)) await collection.empty();
-			await collection.deleteOne().exec();
+			await collection.deleteOne();
 		});
 
 		next();
