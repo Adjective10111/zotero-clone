@@ -1,11 +1,16 @@
-.vscode/
-node_modules/
-
-temp/
+# secure
 *.env
+
+# temporary
+temp/
 *.bak
 
+# misc
+.vscode/
+node_modules/
 build/*
+
+# needed folders
 !build/public
 !build/public/*
 build/public/*/*
@@ -13,3 +18,7 @@ build/public/*/*
 !build/private
 build/private/*
 !build/private/.mt
+
+# test folders
+src/public
+src/private
