@@ -1,6 +1,9 @@
 name: CD-Liara
 on:
   push:
+    paths-ignore:
+      - 'README.md'
+      - '.*'
     branches: [master]
 jobs:
   deploy:
