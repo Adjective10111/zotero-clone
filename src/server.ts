@@ -17,7 +17,8 @@ if (db === process.env.DATABASE_LIARA)
 	};
 mongoose
 	.connect(db, connectionOptions)
-	.then(() => console.log('> DB connection successful!'));
+	.then(() => console.log('> DB connection successful!'))
+	.catch(err => console.log(err));
 //#endregion
 
 // localhost:3000/api/
