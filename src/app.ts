@@ -23,8 +23,8 @@ app
 			origin: true,
 			methods: ['GET', 'POST', 'PATCH', 'DELETE'],
 			credentials: true,
-			allowedHeaders: ['Cookie', 'Authorization'],
-			exposedHeaders: ['Set-Cookie', 'Cross-Origin-*']
+			allowedHeaders: '*',
+			exposedHeaders: '*'
 		})
 	)
 	.use(
