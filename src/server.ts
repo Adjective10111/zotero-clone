@@ -5,10 +5,7 @@ import * as serverShutter from './utils/serverShutter';
 
 //#region db connection
 const db =
-	process.env.DATABASE?.replace(
-		'<PASSWORD>',
-		process.env.DATABASE_PASSWORD || 'error'
-	) ||
+	process.env.DATABASE ||
 	process.env.DATABASE_LIARA ||
 	process.env.DATABASE_LOCAL ||
 	'error';
