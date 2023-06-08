@@ -43,6 +43,8 @@ export default class Authenticator {
 			resCookieOptions['expires'] = new Date(
 				Date.now() + parseInt(expiration.cookie) * 24 * 3600 * 1000
 			);
+
+		req.token = token;
 		return [cookieName, token, resCookieOptions];
 	}
 
