@@ -239,7 +239,7 @@ attaches an attachment to the item
 - mandatory:
   - 'name': string
   - 'parent': Item - will be set automatically
-  - 'type': attachmentType
+  - 'type': attachmentType id
   - 'file': Any File
 
 #### `GET ../items/{id}/attachments`
@@ -321,6 +321,6 @@ create new attachment type
 - mandatory:
   - 'name': string
   - 'api': string - link
-  - 'metadataKeys': string[]
+  - 'metadataKeys': string[] | csv-style string
 - allowed:
   - 'icon': image file
