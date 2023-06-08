@@ -22,7 +22,9 @@ app
 		cors({
 			origin: true,
 			methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-			credentials: true
+			credentials: true,
+			allowedHeaders: ['Authorization', 'Cookie', 'Content-*'],
+			exposedHeaders: ['Set-Cookie', '*Content*', 'XML*']
 		})
 	)
 	.use(
