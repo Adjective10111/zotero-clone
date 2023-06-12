@@ -47,6 +47,7 @@ router
 		controller.getOne,
 		ItemController.authorizeEdit,
 		controller.validateBody.patch,
+		controller.checkTags,
 		controller.patchDocument,
 		controller.sendResponse('patch')
 	)
