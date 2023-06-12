@@ -13,13 +13,7 @@ import {
 } from './types';
 
 class QueryHandler<DocType> {
-	static readonly resCtrlKeys: string[] = [
-		'page',
-		'sort',
-		'limit',
-		'fields',
-		'all'
-	];
+	static readonly resCtrlKeys: string[] = ['page', 'limit', 'sort', 'fields'];
 
 	constructor(
 		public query: Query<DocType[], DocType>,
