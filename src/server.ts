@@ -1,7 +1,13 @@
 require('dotenv').config({ path: './.env' });
+import * as fs from 'fs';
 import mongoose from 'mongoose';
 import app from './app';
 import * as serverShutter from './utils/serverShutter';
+
+// Privacy Policy reader
+process.env.PRIVACY_POLICY_TEXT = fs
+	.readFileSync(process.env.PRIVACY_POLICY_ROOT_PATH as string)
+	.toString();
 
 //#region db connection
 const db =

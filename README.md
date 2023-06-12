@@ -6,7 +6,6 @@ It also provides an API for information fetching, citation, bibliography, advanc
 
 ## Session todo
 
-- tags performance
 - api calls for metadata fetching
 
 ## Routes
@@ -28,6 +27,16 @@ fetches the logo of group
 fetches the attachment-type's icon
 
 ##### the APIs below are under /api route
+
+### /settings
+
+#### `GET /`
+
+fetches the below data:
+
+- siteURL
+- appVer
+- privacyPolicy
 
 ### /users
 
