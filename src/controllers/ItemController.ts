@@ -104,7 +104,8 @@ export default class ItemController extends Controller<typeof Item> {
 			if (isValidObjectId(value)) return value;
 			if (value.name && value.color) {
 				const { name, color } = value;
-				const tag = await Tag.create({ name, color });
+				let tag = await Tag.findOne({ name, color });
+				if (!tag) tag = await Tag.create({ name, color });
 				return tag.id;
 			}
 			throw createError(400, 'invalid tags array');
