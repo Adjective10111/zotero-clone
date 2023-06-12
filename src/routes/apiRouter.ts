@@ -13,9 +13,10 @@ const router = Router();
 
 router.use('/users', userRouter);
 
-router.use(UserController.authenticate);
 router.use('/groups', groupRouter);
 router.use('/libraries', libraryRouter);
+
+router.use(UserController.authenticate);
 router.use('/collections', collectionRouter);
 router.use('/items', itemRouter);
 router.use('/attachments', attachmentRouter);
