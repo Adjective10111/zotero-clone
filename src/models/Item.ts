@@ -5,11 +5,7 @@ import { ATypeDoc } from './AttachmentType';
 import { type ICollection } from './Collection';
 import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
-
-interface ITag {
-	name: string;
-	color: string;
-}
+import Tag, { TagDoc } from './Tag';
 
 export interface IItem extends ITimestamped {
 	library: LibraryDoc;
@@ -24,14 +20,23 @@ export interface IItem extends ITimestamped {
 	notes?: INote[];
 
 	related: ({ name: string; item: IItem } | IItem)[];
-	tags: ITag[];
+	tags: TagDoc[];
 }
+
+type AggregateFilter = {
+	$match: object;
+};
 
 interface IItemMethods {
 	relate(doc: Doc<IItem> | Types.ObjectId): Promise<void>;
 }
 
-type ItemModel = Model<IItem, {}, IItemMethods>;
+interface ItemModel extends Model<IItem, {}, IItemMethods> {
+	searchTag(
+		tag: Types.ObjectId | string,
+		filter: AggregateFilter
+	): Promise<Doc<IItem>[]>;
+}
 export type ItemDoc = Doc<IItem, IItemMethods>;
 
 const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
@@ -75,8 +80,8 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 		tags: {
 			type: [
 				{
-					name: String,
-					color: String
+					type: Types.ObjectId,
+					ref: Tag
 				}
 			],
 			default: []
@@ -99,7 +104,6 @@ itemSchema.virtual('attachments', {
 	foreignField: 'parent',
 	localField: '_id'
 });
-
 itemSchema.virtual('notes', {
 	ref: 'Note',
 	foreignField: 'parent',
@@ -120,6 +124,20 @@ itemSchema.methods.relate = async function (
 
 	await doc.save();
 	await this.save();
+};
+itemSchema.statics.searchTag = async function (
+	tag: Types.ObjectId | string,
+	filter: AggregateFilter
+): Promise<Doc<IItem>[]> {
+	return await Item.aggregate([
+		filter,
+		{
+			$unwind: '$tags'
+		},
+		{
+			$match: { tags: tag }
+		}
+	]);
 };
 
 itemSchema.pre('save', function (next) {

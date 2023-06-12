@@ -7,6 +7,7 @@ import groupRouter from './groupRouter';
 import itemRouter from './itemRouter';
 import libraryRouter from './libraryRouter';
 import noteRouter from './noteRouter';
+import tagRouter from './tagRouter';
 import userRouter from './userRouter';
 
 const router = Router();
@@ -22,5 +23,6 @@ router.use('/items', itemRouter);
 router.use('/attachments', attachmentRouter);
 router.use('/attachmentTypes', attachmentTypeRouter);
 router.use('/notes', noteRouter);
+router.use('/tags', tagRouter);
 
 export default router;
