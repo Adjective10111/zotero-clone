@@ -119,7 +119,7 @@ collectionSchema.methods.empty = async function (
 	this: Doc<ICollection>
 ): Promise<void> {
 	await this.populate('items');
-	this.items?.forEach(async item => await item.deleteOne().exec());
+	this.items?.forEach(async item => await item.deleteOne());
 };
 
 collectionSchema.statics.isSearchingCollection = function (
