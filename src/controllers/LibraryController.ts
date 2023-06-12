@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+import { Types } from 'mongoose';
 import Collection from '../models/Collection';
 import Group from '../models/Group';
 import Library, { type LibraryDoc } from '../models/Library';
@@ -92,13 +93,26 @@ export default class LibraryController extends Controller<typeof Library> {
 		else next(createError(403, 'unauthorized'));
 	}
 
-	@wrapAsync
-	async deleteCollections(req: ILRequest, res: Response, next: NextFunction) {
-		await req.library?.collections?.forEach(async collection => {
+	static async deleteCollections(lib?: LibraryDoc) {
+		await lib?.collections?.forEach(async collection => {
 			if (Collection.isCollection(collection)) await collection.empty();
 			await collection.deleteOne();
 		});
+	}
 
+	static async deleteLibrariesOf(ownerId: Types.ObjectId) {
+		let libraries = await Library.find({ owner: ownerId });
+		libraries = libraries.filter(lib => !lib.group);
+		while (libraries.length > 0) {
+			const lib = libraries.pop();
+			LibraryController.deleteCollections(lib);
+			await lib?.deleteOne();
+		}
+	}
+
+	@wrapAsync
+	async deleteCollections(req: ILRequest, res: Response, next: NextFunction) {
+		await LibraryController.deleteCollections(req.library);
 		next();
 	}
 
