@@ -215,7 +215,7 @@ adds an item to the collection
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tags': TagObject[] - { name: string, color: string }
+  - 'tags': TagObject[] - { name: string, color: string } | ObjectId of the tag
   - 'related': Item[]
 
 #### `GET ../collections/{id}/items`
@@ -236,12 +236,18 @@ patch item
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tags': TagObject[] - { name: string, color: string }
+  - 'tags': TagObject[] - { name: string, color: string } | ObjectId of the tag
   - 'related': Item[]
 
 #### `DELETE /{id}`
 
 delete item
+
+### /tags
+
+#### `GET /`
+
+fetches all the available tags
 
 ### /attachments
 
