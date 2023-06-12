@@ -71,6 +71,14 @@ export default class LibraryController extends Controller<typeof Library> {
 		next();
 	}
 
+	filterByPublicity(req: IFilterRequest, res: Response, next: NextFunction) {
+		req.defaultFilter = {
+			...(req.defaultFilter || {}),
+			private: false
+		};
+		next();
+	}
+
 	filterByOwner = super.filterByOwnerFactory('owner');
 
 	authorizeOwnership = super.authorizeOwnershipFactory(this.modelName, 'owner');
