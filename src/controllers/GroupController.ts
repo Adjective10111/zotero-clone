@@ -1,10 +1,11 @@
 import { NextFunction, Response } from 'express';
-import { Types } from 'mongoose';
+import { Types, isValidObjectId } from 'mongoose';
 import Group, { GroupDoc } from '../models/Group';
 import { LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
+import UserController from './UserController';
 
 export interface IGRequest extends IRequest {
 	group?: GroupDoc;
@@ -77,4 +78,20 @@ export default class GroupController extends Controller<typeof Group> {
 	addLibraryPopulateArray = this.createPopulateArray({ path: 'libraries' });
 
 	addOwner = this.addUserIdToBody('owner');
+
+	@wrapAsync
+	async checkEditors(req: IRequest, res: Response, next: NextFunction) {
+		const tags: any[] = req.body.editors || req.body.newEditors;
+		tags.map(async (value: any): Promise<Types.ObjectId> => {
+			if (isValidObjectId(value)) return value;
+			if (typeof value === 'string') {
+				const user = await UserController.getUser(value);
+				if (!user) throw createError(400, 'invalid data in array');
+				return user.id;
+			}
+			throw createError(400, 'invalid editors array');
+		});
+
+		next();
+	}
 }

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { NextFunction, Response } from 'express';
+import { Types } from 'mongoose';
 import User, { UserDoc } from '../models/User';
 import Authenticator from '../utils/Authenticator';
 import Controller from '../utils/Controller';
@@ -64,6 +65,10 @@ export default class UserController extends Controller<typeof User> {
 
 	constructor() {
 		super(User);
+	}
+
+	static async getUser(email: string) {
+		return await User.findOne({ email });
 	}
 
 	static caughtAuthenticate = Authenticator.caughtAuthenticate(
