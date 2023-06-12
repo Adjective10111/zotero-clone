@@ -5,6 +5,7 @@ import Authenticator from '../utils/Authenticator';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { type IRequest } from '../utils/types';
+import LibraryController from './LibraryController';
 
 type IURequest = IRequest<UserDoc>;
 
@@ -137,6 +138,7 @@ export default class UserController extends Controller<typeof User> {
 		if (!req.user?.checkPassword(currentPassword))
 			return next(createError(400, 'incorrect credentials'));
 
+		await LibraryController.deleteLibrariesOf(req.user.id);
 		await req.user.deleteOne();
 		next();
 	}
