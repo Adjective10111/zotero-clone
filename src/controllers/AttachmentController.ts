@@ -27,7 +27,8 @@ export default class AttachmentController extends Controller<
 
 	bodyKeys = {
 		create: {
-			mandatory: ['parent', 'name', 'type', 'filename']
+			mandatory: ['parent', 'name', 'type', 'filename'],
+			allowed: ['setAsPrimaryAttachment']
 		},
 		patch: {
 			allowed: ['parent', 'name', 'type']
@@ -71,8 +72,10 @@ export default class AttachmentController extends Controller<
 
 	createOne = catchAsync(
 		async (req: IRequest, res: Response, next: NextFunction): Promise<void> => {
+			const primary = req.body.setAsPrimaryAttachment || false;
+			req.body.setAsPrimaryAttachment = undefined;
 			const document = await this.model.create(req.body);
-			if (req.putAsPrimaryAttachment) {
+			if (primary) {
 				req.item.primaryAttachment = document.id;
 				await req.item.save();
 			}
