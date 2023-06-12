@@ -40,6 +40,7 @@ const groupSchema = new Schema<IGroup, GroupModel, IGroupMethods>(
 		}
 	},
 	{
+		timestamps: true,
 		toJSON: {
 			virtuals: true
 		}
