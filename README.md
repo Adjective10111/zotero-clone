@@ -117,7 +117,7 @@ creates a group
   - 'owner': user - will be filled automatically
 - allowed:
   - 'logo': image file
-  - 'editors': user[] - they will have access to the group's libraries
+  - 'editors': (userId | email)[] - they will have access to the group's libraries
 
 #### `GET /{id}`
 
@@ -130,8 +130,8 @@ patches the group with specified id
 - allowed:
   - 'logo': image file
   - 'name': string
-  - 'editors': user[] - they will have access to the group's libraries
-  - 'newEditors': user[] - they will be added to the group's editors
+  - 'editors': (userId | email)[] - they will have access to the group's libraries
+  - 'newEditors': (userId | email)[] - they will be added to the group's editors
 
 ##### either use 'editors' or 'newEditors' - DO NOT USE THEM BOTH
 
