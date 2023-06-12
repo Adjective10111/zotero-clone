@@ -343,3 +343,29 @@ create new attachment type
   - 'metadataKeys': string[] | csv-style string
 - allowed:
   - 'icon': image file
+
+## Query Params - GET ALL
+
+### Page: number
+
+paginates the bulk get requests.
+
+`default: 1`
+
+### limit: number
+
+limits the number of data that gets sent
+
+`default: 25`
+
+### sort: string - comma separated
+
+sorts the data gotten from database
+
+use `-` for descending order
+
+### fields: string - comma separated
+
+selects what properties to get
+
+you can use `-` to exclude a property
