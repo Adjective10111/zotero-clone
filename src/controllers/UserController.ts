@@ -6,29 +6,30 @@ import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { type IRequest } from '../utils/types';
 
-type URequest = IRequest<UserDoc>;
+type IURequest = IRequest<UserDoc>;
 
-interface ILogin extends URequest {
+interface ILogin extends IURequest {
 	body: {
 		email: string;
 		password: string;
 	};
 }
 
-interface IResetRequest extends URequest {
+interface IResetRequest extends IURequest {
 	params: { token: string };
 	body: { newPassword: string };
 }
-interface IChangeRequest extends URequest {
-	body: {
-		currentPassword: string;
-		newPassword: string;
-	};
-}
-interface ITokenRequest extends URequest {
+interface ITokenRequest extends IURequest {
 	passwordResetToken?: string;
 	body: {
 		email: string;
+	};
+}
+
+interface IChangeRequest extends IURequest {
+	body: {
+		currentPassword: string;
+		newPassword: string;
 	};
 }
 
@@ -43,16 +44,18 @@ export default class UserController extends Controller<typeof User> {
 		login: { mandatory: ['email', 'password'] },
 		patch: { allowed: ['name', 'profile', 'role'] },
 		changePassword: { mandatory: ['currentPassword', 'newPassword'] },
-		resetToken: { mandatory: ['email'] },
-		resetPassword: { mandatory: ['newPassword'] }
+		// resetToken: { mandatory: ['email'] },
+		// resetPassword: { mandatory: ['newPassword'] },
+		deleteAccount: { mandatory: ['currentPassword'] }
 	};
 	validateBody = {
 		signUp: this.preventMaliciousBody(this.bodyKeys.signUp),
 		login: this.preventMaliciousBody(this.bodyKeys.login),
 		patch: this.preventMaliciousBody(this.bodyKeys.patch),
-		resetToken: this.preventMaliciousBody(this.bodyKeys.resetToken),
+		// resetToken: this.preventMaliciousBody(this.bodyKeys.resetToken),
+		// resetPassword: this.preventMaliciousBody(this.bodyKeys.resetPassword)
 		changePassword: this.preventMaliciousBody(this.bodyKeys.changePassword),
-		resetPassword: this.preventMaliciousBody(this.bodyKeys.resetPassword)
+		deleteAccount: this.preventMaliciousBody(this.bodyKeys.deleteAccount)
 	};
 	removeField = {
 		password: this.createRemoveFieldsObject('password')
@@ -72,7 +75,7 @@ export default class UserController extends Controller<typeof User> {
 		true
 	);
 
-	validateRoleValue(req: URequest, res: Response, next: NextFunction) {
+	validateRoleValue(req: IURequest, res: Response, next: NextFunction) {
 		if (req.body?.role === 'admin')
 			next(createError(403, 'You cannot set your role as admin'));
 		else next();
@@ -97,7 +100,7 @@ export default class UserController extends Controller<typeof User> {
 		next();
 	}
 	@wrapAsync
-	async logout(req: URequest, res: Response, next: NextFunction) {
+	async logout(req: IURequest, res: Response, next: NextFunction) {
 		req.user = (await User.findById(req.user?.id).select(
 			'+blackTokens'
 		)) as UserDoc;
@@ -129,38 +132,48 @@ export default class UserController extends Controller<typeof User> {
 	}
 
 	@wrapAsync
-	async generateResetToken(
-		req: ITokenRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		const user = await User.findOne({ email: req.body.email });
-		if (!user) return next(createError(404, 'no user with this email'));
+	async deleteAccount(req: IURequest, res: Response, next: NextFunction) {
+		const { currentPassword } = req.body;
+		if (!req.user?.checkPassword(currentPassword))
+			return next(createError(400, 'incorrect credentials'));
 
-		req.passwordResetToken = await user.createPasswordResetToken();
-		next();
-	}
-	@wrapAsync
-	async resetPassword(req: IResetRequest, res: Response, next: NextFunction) {
-		const hashedToken = crypto
-			.createHash('sha256')
-			.update(req.params.token)
-			.digest('hex');
-		const { newPassword } = req.body;
-
-		req.user = (await User.findOne({
-			passwordResetToken: hashedToken,
-			passwordResetExpiration: { $gt: Date.now() }
-		})) as UserDoc;
-		if (!req.user)
-			return next(createError(400, 'token is invalid or has expired'));
-
-		await req.user.changePassword(newPassword);
+		await req.user.deleteOne();
 		next();
 	}
 
+	// @wrapAsync
+	// async generateResetToken(
+	// 	req: ITokenRequest,
+	// 	res: Response,
+	// 	next: NextFunction
+	// ) {
+	// 	const user = await User.findOne({ email: req.body.email });
+	// 	if (!user) return next(createError(404, 'no user with this email'));
+
+	// 	req.passwordResetToken = await user.createPasswordResetToken();
+	// 	next();
+	// }
+	// @wrapAsync
+	// async resetPassword(req: IResetRequest, res: Response, next: NextFunction) {
+	// 	const hashedToken = crypto
+	// 		.createHash('sha256')
+	// 		.update(req.params.token)
+	// 		.digest('hex');
+	// 	const { newPassword } = req.body;
+
+	// 	req.user = (await User.findOne({
+	// 		passwordResetToken: hashedToken,
+	// 		passwordResetExpiration: { $gt: Date.now() }
+	// 	})) as UserDoc;
+	// 	if (!req.user)
+	// 		return next(createError(400, 'token is invalid or has expired'));
+
+	// 	await req.user.changePassword(newPassword);
+	// 	next();
+	// }
+
 	@wrapAsync
-	async terminateSessions(req: URequest, res: Response, next: NextFunction) {
+	async terminateSessions(req: IURequest, res: Response, next: NextFunction) {
 		await req.user?.terminateSessions();
 		res.status(200).json({
 			status: 'success',

@@ -39,6 +39,10 @@ router
 		fileController.addFilePath('profile'),
 		controller.patchDocument,
 		controller.sendResponse('patch')
+	).delete(
+		controller.validateBody.deleteAccount,
+		controller.deleteAccount,
+		controller.sendResponse('delete')
 	);
 router.patch(
 	'/changePassword',
