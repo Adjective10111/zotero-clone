@@ -25,6 +25,7 @@ const handleValidationErrorDB = (err: any) => {
 };
 
 const modifyError = (err: any) => {
+	if (!err.name) err.name = err.message.split(':')[0];
 	/* database */
 	if (err.code === 11000) return handleDuplicateFieldsDB(err);
 	if (err.name === 'CastError') return handleCastErrorDB(err);
