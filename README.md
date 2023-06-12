@@ -76,11 +76,24 @@ changes the password
   - 'currentPassword': string above 8 chars long
   - 'newPassword': string above 8 chars long
 
+#### `DELETE /me`
+
+deletes the account
+
+- mandatory:
+  - 'currentPassword': string above 8 chars long
+
 #### `DELETE /terminateSessions`
 
 terminates all sessions and logs all of them out
 
 ### /groups
+
+#### `GET /public`
+
+fetches all the groups that are in our app
+
+###### for now... may be modified later
 
 #### `GET /`
 
@@ -118,6 +131,10 @@ patches the group with specified id
 deletes the specified group
 
 ### /libraries
+
+#### `GET /public`
+
+fetches all the public libraries that are in our app
 
 #### `GET /`
 
@@ -241,6 +258,8 @@ attaches an attachment to the item
   - 'parent': Item - will be set automatically
   - 'type': attachmentType id
   - 'file': Any File
+- allowed:
+  - 'setAsPrimaryAttachment': boolean
 
 #### `GET ../items/{id}/attachments`
 
