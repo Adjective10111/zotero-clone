@@ -43,7 +43,8 @@ const attachmentSchema = new Schema<
 		}
 	},
 	{
-		timestamps: true
+		timestamps: true,
+		versionKey: false
 	}
 );
 

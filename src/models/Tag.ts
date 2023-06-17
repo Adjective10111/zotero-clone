@@ -30,7 +30,8 @@ const tagSchema = new Schema<ITag, TagModel, ITagMethods>(
 		timestamps: true,
 		toJSON: {
 			virtuals: true
-		}
+		},
+		versionKey: false
 	}
 );
 

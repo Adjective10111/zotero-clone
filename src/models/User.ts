@@ -21,47 +21,52 @@ export type UserDoc = Doc<IUser, IUserMethods>;
 
 type UserModel = Model<IUser, {}, IUserMethods>;
 
-const userSchema = new Schema<IUser, UserModel, IUserMethods>({
-	profile: {
-		type: String
-	},
-	name: {
-		type: String,
-		required: [true, 'user must have a name']
-	},
-	email: {
-		type: String,
-		lowercase: true,
-		unique: true,
-		required: [true, 'user must have an email'],
-		validate: [validator.isEmail, 'Please provide a valid email']
-	},
-	password: {
-		type: String,
-		required: [true, 'please specify a password'],
-		minlength: 8,
-		select: false
-	},
-	role: {
-		type: String,
-		default: 'user'
-	},
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
+	{
+		profile: {
+			type: String
+		},
+		name: {
+			type: String,
+			required: [true, 'user must have a name']
+		},
+		email: {
+			type: String,
+			lowercase: true,
+			unique: true,
+			required: [true, 'user must have an email'],
+			validate: [validator.isEmail, 'Please provide a valid email']
+		},
+		password: {
+			type: String,
+			required: [true, 'please specify a password'],
+			minlength: 8,
+			select: false
+		},
+		role: {
+			type: String,
+			default: 'user'
+		},
 
-	passwordResetToken: {
-		type: String,
-		select: false
+		passwordResetToken: {
+			type: String,
+			select: false
+		},
+		passwordResetExpiration: {
+			type: Date,
+			select: false
+		},
+		allowedSessionsAfter: Number,
+		blackTokens: {
+			type: [Object],
+			default: [],
+			select: false
+		}
 	},
-	passwordResetExpiration: {
-		type: Date,
-		select: false
-	},
-	allowedSessionsAfter: Number,
-	blackTokens: {
-		type: [Object],
-		default: [],
-		select: false
+	{
+		versionKey: false
 	}
-});
+);
 
 passwordManagement(userSchema);
 

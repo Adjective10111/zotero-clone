@@ -91,7 +91,8 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 		timestamps: true,
 		toJSON: {
 			virtuals: true
-		}
+		},
+		versionKey: false
 	}
 );
 

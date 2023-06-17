@@ -41,7 +41,8 @@ const noteSchema = new Schema<INote, NoteModel, INoteMethods>(
 		timestamps: true,
 		toJSON: {
 			virtuals: true
-		}
+		},
+		versionKey: false
 	}
 );
 

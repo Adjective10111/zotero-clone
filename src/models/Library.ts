@@ -67,7 +67,8 @@ const librarySchema = new Schema<ILibrary, LibraryModel, ILibraryMethods>(
 		timestamps: true,
 		toJSON: {
 			virtuals: true
-		}
+		},
+		versionKey: false
 	}
 );
 
