@@ -60,38 +60,15 @@ export default class NoteController extends Controller<typeof Note> {
 	}
 
 	@wrapAsync
-	static async authorizeEdit(
-		req: INRequest,
-		res: Response,
-		next: NextFunction
-	) {
+	static async addLibToReq(req: INRequest, res: Response, next: NextFunction) {
 		if (req.note?.parentModel === 'parentItem') {
 			await req.note?.parentItem?.populate('library');
-			if (await req.note?.parentItem?.library?.canEdit(req.user?.id)) next();
-			else next(createError(403, 'unauthorized'));
+			req.library = req.note?.parentItem?.library;
 		} else {
 			await req.note?.parentCollection?.populate('parent');
-			if (await req.note?.parentCollection?.parent?.canEdit(req.user?.id))
-				next();
-			else next(createError(403, 'unauthorized'));
+			req.library = req.note?.parentCollection?.parent;
 		}
-	}
-	@wrapAsync
-	static async authorizeView(
-		req: INRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		if (req.note?.parentModel === 'parentItem') {
-			await req.note?.parentItem?.populate('library');
-			if (await req.note?.parentItem?.library?.canView(req.user?.id)) next();
-			else next(createError(403, 'unauthorized'));
-		} else {
-			await req.note?.parentCollection?.populate('parent');
-			if (await req.note?.parentCollection?.parent?.canView(req.user?.id))
-				next();
-			else next(createError(403, 'unauthorized'));
-		}
+		next();
 	}
 
 	isParentCollections(req: IRequest): boolean {

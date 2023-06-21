@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import CollectionController from '../controllers/CollectionController';
-import ItemController from '../controllers/ItemController';
+import LibraryController from '../controllers/LibraryController';
 import NoteController from '../controllers/NoteController';
 
 const router = Router();
@@ -11,13 +10,15 @@ router
 	.get(
 		controller.getOne,
 		controller.populateParent,
-		NoteController.authorizeView,
+		NoteController.addLibToReq,
+		LibraryController.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.getOne,
 		controller.populateParent,
-		NoteController.authorizeEdit,
+		NoteController.addLibToReq,
+		LibraryController.authorizeEdit,
 		controller.validateBody.patch,
 		controller.patchById,
 		controller.sendResponse('patch')
@@ -25,7 +26,8 @@ router
 	.delete(
 		controller.getOne,
 		controller.populateParent,
-		NoteController.authorizeEdit,
+		NoteController.addLibToReq,
+		LibraryController.authorizeDelete,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
 	);
@@ -35,15 +37,17 @@ router.use(controller.allowChildRouter);
 
 router
 	.route('/')
-	.get(controller.getAll, controller.sendResponse('getAll'))
+	.get(
+		LibraryController.authorizeView,
+		controller.getAll,
+		controller.sendResponse('getAll')
+	)
 	.post(
+		LibraryController.authorizeAdd,
 		controller.condition({
 			if: [controller.isParentCollections],
-			then: [
-				CollectionController.authorizeEdit,
-				controller.addCollectionToBody
-			],
-			else: [ItemController.authorizeEdit, controller.addItemToBody]
+			then: [controller.addCollectionToBody],
+			else: [controller.addItemToBody]
 		}),
 		controller.validateBody.create,
 		controller.createOne,
