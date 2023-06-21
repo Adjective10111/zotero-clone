@@ -21,8 +21,10 @@ interface ILibrary {
 interface ILibraryMethods {
 	initialize(this: Doc<ILibrary>): Promise<void>;
 	emptyBin(this: Doc<ILibrary>): Promise<void>;
-	canEdit(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
 	canView(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
+	canAdd(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
+	canEdit(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
+	canDelete(this: Doc<ILibrary>, userId: Types.ObjectId): Promise<boolean>;
 }
 
 export type LibraryDoc = Doc<ILibrary, ILibraryMethods>;
@@ -112,19 +114,7 @@ librarySchema.methods.initialize = async function (): Promise<void> {
 librarySchema.methods.emptyBin = async function (): Promise<void> {
 	await (this.bin as CollectionDoc).empty();
 };
-librarySchema.methods.canEdit = async function (
-	userId: Types.ObjectId
-): Promise<boolean> {
-	if (!this.group && !this.private) return true;
 
-	let ownerId: Types.ObjectId;
-	if (this.populated('owner')) ownerId = this.owner.id;
-	else ownerId = this.owner as Types.ObjectId;
-	if (ownerId.equals(userId)) return true;
-
-	if (!this.populated('group')) await this.populate('group');
-	return this.group?.has(userId) as boolean;
-};
 librarySchema.methods.canView = async function (
 	userId: Types.ObjectId
 ): Promise<boolean> {
@@ -137,6 +127,45 @@ librarySchema.methods.canView = async function (
 
 	if (!this.populated('group')) await this.populate('group');
 	return this.group?.has(userId) as boolean;
+};
+librarySchema.methods.canAdd = async function (
+	userId: Types.ObjectId
+): Promise<boolean> {
+	if (!this.group && !this.private) return true;
+
+	let ownerId: Types.ObjectId;
+	if (this.populated('owner')) ownerId = this.owner.id;
+	else ownerId = this.owner as Types.ObjectId;
+	if (ownerId.equals(userId)) return true;
+
+	if (!this.populated('group')) await this.populate('group');
+	return this.group?.canAdd(userId) as boolean;
+};
+librarySchema.methods.canEdit = async function (
+	userId: Types.ObjectId
+): Promise<boolean> {
+	if (!this.group && !this.private) return true;
+
+	let ownerId: Types.ObjectId;
+	if (this.populated('owner')) ownerId = this.owner.id;
+	else ownerId = this.owner as Types.ObjectId;
+	if (ownerId.equals(userId)) return true;
+
+	if (!this.populated('group')) await this.populate('group');
+	return this.group?.canEdit(userId) as boolean;
+};
+librarySchema.methods.canDelete = async function (
+	userId: Types.ObjectId
+): Promise<boolean> {
+	if (!this.group && !this.private) return true;
+
+	let ownerId: Types.ObjectId;
+	if (this.populated('owner')) ownerId = this.owner.id;
+	else ownerId = this.owner as Types.ObjectId;
+	if (ownerId.equals(userId)) return true;
+
+	if (!this.populated('group')) await this.populate('group');
+	return this.group?.canDelete(userId) as boolean;
 };
 
 librarySchema.post('save', async function () {

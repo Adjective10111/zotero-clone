@@ -18,7 +18,6 @@ router.use(UserController.authenticate);
 router.use(
 	'/:id/collections',
 	controller.getOne,
-	LibraryController.authorizeView,
 	controller.filterByLibrary,
 	controller.useAsParentParam('id'),
 	collectionRouter
@@ -58,7 +57,7 @@ router
 	.delete(
 		controller.queuePopulateField.collections,
 		controller.getOne,
-		controller.authorizeOwnership,
+		LibraryController.authorizeDelete,
 		controller.deleteCollections,
 		controller.deleteDocument,
 		controller.sendResponse('delete')

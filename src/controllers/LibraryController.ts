@@ -92,12 +92,26 @@ export default class LibraryController extends Controller<typeof Library> {
 		else next(createError(403, 'unauthorized'));
 	}
 	@wrapAsync
+	static async authorizeAdd(req: ILRequest, res: Response, next: NextFunction) {
+		if (await req.library?.canAdd(req.user?.id)) next();
+		else next(createError(403, 'unauthorized'));
+	}
+	@wrapAsync
 	static async authorizeEdit(
 		req: ILRequest,
 		res: Response,
 		next: NextFunction
 	) {
 		if (await req.library?.canEdit(req.user?.id)) next();
+		else next(createError(403, 'unauthorized'));
+	}
+	@wrapAsync
+	static async authorizeDelete(
+		req: ILRequest,
+		res: Response,
+		next: NextFunction
+	) {
+		if (await req.library?.canDelete(req.user?.id)) next();
 		else next(createError(403, 'unauthorized'));
 	}
 
