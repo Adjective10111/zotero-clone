@@ -79,22 +79,9 @@ export default class ItemController extends Controller<typeof Item> {
 	);
 
 	@wrapAsync
-	static async authorizeEdit(
-		req: IIRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		if (await req.item?.library?.canEdit(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
-	}
-	@wrapAsync
-	static async authorizeView(
-		req: IIRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		if (await req.item?.library?.canView(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
+	static async addLibToReq(req: IIRequest, res: Response, next: NextFunction) {
+		if (!req.item?.populated('library')) await req.item?.populate('library');
+		req.library = req.item?.library;
 	}
 
 	@wrapAsync
