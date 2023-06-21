@@ -2,6 +2,7 @@ import { Router } from 'express';
 import AttachmentController from '../controllers/AttachmentController';
 import FileController from '../controllers/FileController';
 import ItemController from '../controllers/ItemController';
+import LibraryController from '../controllers/LibraryController';
 
 const router = Router();
 const controller = new AttachmentController();
@@ -11,7 +12,8 @@ router.get(
 	'/:id/file',
 	controller.queuePopulateField.parent,
 	controller.getOne,
-	AttachmentController.authorizeView,
+	AttachmentController.addLibToReq,
+	LibraryController.authorizeView,
 	controller.addFileInfoToReq,
 	fileController.downloadFile
 );
@@ -21,13 +23,15 @@ router
 	.get(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		AttachmentController.authorizeView,
+		AttachmentController.addLibToReq,
+		LibraryController.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		AttachmentController.authorizeEdit,
+		AttachmentController.addLibToReq,
+		LibraryController.authorizeEdit,
 		controller.validateBody.patch,
 		controller.patchById,
 		controller.sendResponse('patch')
@@ -35,7 +39,8 @@ router
 	.delete(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		AttachmentController.authorizeEdit,
+		AttachmentController.addLibToReq,
+		LibraryController.authorizeDelete,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
 	);
@@ -45,9 +50,13 @@ router.use(controller.allowChildRouter);
 
 router
 	.route('/')
-	.get(controller.getAll, controller.sendResponse('getAll'))
+	.get(
+		LibraryController.authorizeView,
+		controller.getAll,
+		controller.sendResponse('getAll')
+	)
 	.post(
-		ItemController.authorizeEdit,
+		LibraryController.authorizeAdd,
 		fileController.uploadFile,
 		fileController.addFileName('filename'),
 		controller.addItemToBody,

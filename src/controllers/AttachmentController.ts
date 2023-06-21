@@ -46,24 +46,10 @@ export default class AttachmentController extends Controller<
 	}
 
 	@wrapAsync
-	static async authorizeEdit(
-		req: IARequest,
-		res: Response,
-		next: NextFunction
-	) {
+	static async addLibToReq(req: IARequest, res: Response, next: NextFunction) {
 		await req.attachment?.parent.populate('library');
-		if (await req.attachment?.parent.library?.canEdit(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
-	}
-	@wrapAsync
-	static async authorizeView(
-		req: IARequest,
-		res: Response,
-		next: NextFunction
-	) {
-		await req.attachment?.parent.populate('library');
-		if (await req.attachment?.parent.library?.canView(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
+		req.library = req.attachment?.parent.library;
+		next();
 	}
 
 	isParentCollections(req: IRequest): boolean {
