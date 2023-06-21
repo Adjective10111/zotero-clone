@@ -28,22 +28,14 @@ app
 				'Cookie',
 				'Content-Type',
 				'Content-Length',
-				'Connection',
-				],
+				'Connection'
+			],
 			exposedHeaders: [
 				'Set-Cookie',
 				'Content-Type',
 				'Content-Length',
-				'XMLHttpRequest',
+				'XMLHttpRequest'
 			]
-		})
-	)
-	.use(
-		'/api',
-		rateLimit({
-			max: 100,
-			windowMs: 60 * 60 * 1000,
-			message: 'Too many requests'
 		})
 	);
 
