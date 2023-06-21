@@ -27,6 +27,7 @@ router
 	.post(
 		fileController.uploadLogo,
 		controller.addOwner,
+		controller.checkMembers,
 		controller.validateBody.create,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
@@ -44,8 +45,9 @@ router
 	)
 	.patch(
 		controller.getOne,
-		controller.authorizeOwnership,
+		controller.authorizeEdit,
 		fileController.uploadLogo,
+		controller.checkMembers,
 		controller.validateBody.patch,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
@@ -54,7 +56,7 @@ router
 	)
 	.delete(
 		controller.getOne,
-		controller.authorizeOwnership,
+		controller.authorizeDelete,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
 	);
