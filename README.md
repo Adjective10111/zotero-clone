@@ -117,7 +117,11 @@ creates a group
   - 'owner': user - will be filled automatically
 - allowed:
   - 'logo': image file
-  - 'editors': (userId | email)[] - they will have access to the group's libraries
+  - 'members' - an array of:
+    - user: userId | email
+    - canAdd: boolean
+    - canEdit: boolean
+    - canDelete: boolean
 
 #### `GET /{id}`
 
@@ -130,10 +134,18 @@ patches the group with specified id
 - allowed:
   - 'logo': image file
   - 'name': string
-  - 'editors': (userId | email)[] - they will have access to the group's libraries
-  - 'newEditors': (userId | email)[] - they will be added to the group's editors
+  - 'members' - an array of:
+    - user: userId | email
+    - canAdd: boolean
+    - canEdit: boolean
+    - canDelete: boolean
+  - 'newMembers' - an array of objects with properties below, that will be added to members:
+    - user: userId | email
+    - canAdd: boolean
+    - canEdit: boolean
+    - canDelete: boolean
 
-##### either use 'editors' or 'newEditors' - DO NOT USE THEM BOTH
+##### either use 'members' or 'newMembers' - DO NOT USE THEM BOTH
 
 #### `DELETE /{id}`
 
