@@ -39,6 +39,19 @@ export default class GroupController extends Controller<typeof Group> {
 		}
 	};
 
+	populateOptions = {
+		owner: {
+			path: 'owner'
+		},
+		libraries: {
+			path: 'libraries'
+		}
+	};
+	queuePopulateField = {
+		owner: this.createPopulateArray(this.populateOptions.owner),
+		libraries: this.createPopulateArray(this.populateOptions.libraries)
+	};
+
 	constructor() {
 		super(Group);
 	}
@@ -74,8 +87,6 @@ export default class GroupController extends Controller<typeof Group> {
 
 		next();
 	}
-
-	addLibraryPopulateArray = this.createPopulateArray({ path: 'libraries' });
 
 	addOwner = this.addUserIdToBody('owner');
 

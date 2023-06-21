@@ -32,6 +32,7 @@ const groupSchema = new Schema<IGroup, GroupModel, IGroupMethods>(
 		},
 		owner: {
 			type: Types.ObjectId,
+			ref: 'User',
 			required: [true, 'a group must have an owner']
 		},
 		editors: {

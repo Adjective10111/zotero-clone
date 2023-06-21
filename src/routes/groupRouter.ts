@@ -9,6 +9,7 @@ const fileController = FileController.createImageController();
 
 router.get(
 	'/public',
+	controller.queuePopulateField.owner,
 	controller.getAll,
 	controller.sendResponse('getAll')
 );
@@ -19,6 +20,7 @@ router
 	.route('/')
 	.get(
 		controller.filterByMembership,
+		controller.queuePopulateField.owner,
 		controller.getAll,
 		controller.sendResponse('getAll')
 	)
@@ -34,7 +36,8 @@ router
 router
 	.route('/:id')
 	.get(
-		controller.addLibraryPopulateArray,
+		controller.queuePopulateField.libraries,
+		controller.queuePopulateField.owner,
 		controller.getOne,
 		controller.authorizeMembership,
 		controller.sendResponse('getOne')
