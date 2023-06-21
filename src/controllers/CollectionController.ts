@@ -84,21 +84,13 @@ export default class CollectionController extends Controller<
 	}
 
 	@wrapAsync
-	static async authorizeEdit(
+	static async addParentToReq(
 		req: ICRequest,
 		res: Response,
 		next: NextFunction
 	) {
-		if (await req.collection?.parent?.canEdit(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
-	}
-	@wrapAsync
-	static async authorizeView(
-		req: ICRequest,
-		res: Response,
-		next: NextFunction
-	) {
-		if (await req.collection?.parent?.canView(req.user?.id)) next();
-		else next(createError(403, 'unauthorized'));
+		if (!req.collection?.populated('parent'))
+			await req.collection?.populate('parent');
+		req.library = req.collection?.parent;
 	}
 }

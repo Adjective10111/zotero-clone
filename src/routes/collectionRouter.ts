@@ -12,7 +12,7 @@ router.use(
 	controller.queuePopulateField.parent,
 	controller.getOne,
 	controller.removePopulateArray,
-	CollectionController.authorizeView,
+	CollectionController.addParentToReq,
 	controller.filterBy('parentCollection', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	itemRouter
@@ -22,7 +22,7 @@ router.use(
 	controller.queuePopulateField.parent,
 	controller.getOne,
 	controller.removePopulateArray,
-	CollectionController.authorizeView,
+	CollectionController.addParentToReq,
 	controller.filterBy('parent', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	noteRouter
@@ -34,13 +34,15 @@ router
 		controller.queuePopulateField.parent,
 		controller.queuePopulateField.data,
 		controller.getOne,
-		CollectionController.authorizeView,
+		CollectionController.addParentToReq,
+		LibraryController.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		CollectionController.authorizeEdit,
+		CollectionController.addParentToReq,
+		LibraryController.authorizeEdit,
 		controller.validateBody.patch,
 		controller.patchDocument,
 		controller.sendResponse('patch')
@@ -48,7 +50,8 @@ router
 	.delete(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		CollectionController.authorizeEdit,
+		CollectionController.addParentToReq,
+		LibraryController.authorizeDelete,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
 	);
@@ -58,10 +61,14 @@ router.use(controller.allowChildRouter);
 
 router
 	.route('/')
-	.get(controller.getAll, controller.sendResponse('getAll'))
+	.get(
+		LibraryController.authorizeView,
+		controller.getAll,
+		controller.sendResponse('getAll')
+	)
 	.post(
 		controller.addLibraryToBody,
-		LibraryController.authorizeEdit,
+		LibraryController.authorizeAdd,
 		controller.validateBody.create,
 		controller.createOne,
 		controller.sendResponse('create'),
