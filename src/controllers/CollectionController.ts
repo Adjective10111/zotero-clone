@@ -84,11 +84,7 @@ export default class CollectionController extends Controller<
 	}
 
 	@wrapAsync
-	static async addParentToReq(
-		req: ICRequest,
-		res: Response,
-		next: NextFunction
-	) {
+	static async addLibToReq(req: ICRequest, res: Response, next: NextFunction) {
 		if (!req.collection?.populated('parent'))
 			await req.collection?.populate('parent');
 		req.library = req.collection?.parent;

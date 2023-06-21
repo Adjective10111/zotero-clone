@@ -12,7 +12,7 @@ router.use(
 	controller.queuePopulateField.parent,
 	controller.getOne,
 	controller.removePopulateArray,
-	CollectionController.addParentToReq,
+	CollectionController.addLibToReq,
 	controller.filterBy('parentCollection', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	itemRouter
@@ -22,7 +22,7 @@ router.use(
 	controller.queuePopulateField.parent,
 	controller.getOne,
 	controller.removePopulateArray,
-	CollectionController.addParentToReq,
+	CollectionController.addLibToReq,
 	controller.filterBy('parent', ['collection', '_id']),
 	controller.useAsParentParam('id'),
 	noteRouter
@@ -34,14 +34,14 @@ router
 		controller.queuePopulateField.parent,
 		controller.queuePopulateField.data,
 		controller.getOne,
-		CollectionController.addParentToReq,
+		CollectionController.addLibToReq,
 		LibraryController.authorizeView,
 		controller.sendResponse('getOne')
 	)
 	.patch(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		CollectionController.addParentToReq,
+		CollectionController.addLibToReq,
 		LibraryController.authorizeEdit,
 		controller.validateBody.patch,
 		controller.patchDocument,
@@ -50,7 +50,7 @@ router
 	.delete(
 		controller.queuePopulateField.parent,
 		controller.getOne,
-		CollectionController.addParentToReq,
+		CollectionController.addLibToReq,
 		LibraryController.authorizeDelete,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
