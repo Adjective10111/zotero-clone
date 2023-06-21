@@ -88,5 +88,6 @@ export default class CollectionController extends Controller<
 		if (!req.collection?.populated('parent'))
 			await req.collection?.populate('parent');
 		req.library = req.collection?.parent;
+		next();
 	}
 }

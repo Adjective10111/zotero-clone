@@ -82,6 +82,7 @@ export default class ItemController extends Controller<typeof Item> {
 	static async addLibToReq(req: IIRequest, res: Response, next: NextFunction) {
 		if (!req.item?.populated('library')) await req.item?.populate('library');
 		req.library = req.item?.library;
+		next();
 	}
 
 	@wrapAsync
