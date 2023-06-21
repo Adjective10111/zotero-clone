@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import CollectionController from '../controllers/CollectionController';
 import ItemController from '../controllers/ItemController';
 import LibraryController from '../controllers/LibraryController';
 import attachmentRouter from './attachmentRouter';
