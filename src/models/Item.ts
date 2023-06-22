@@ -138,7 +138,7 @@ itemSchema.statics.searchTag = async function (
 		{
 			$match: { tags: tag }
 		}
-	]);
+	]).exec();
 };
 
 itemSchema.pre('save', function (next) {
