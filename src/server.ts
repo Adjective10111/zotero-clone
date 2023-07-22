@@ -9,7 +9,7 @@ process.env.PRIVACY_POLICY_TEXT = fs
 	.readFileSync(process.env.PRIVACY_POLICY_ROOT_PATH as string)
 	.toString();
 
-//#region db connection
+//#region database connection
 const db =
 	process.env.DATABASE ||
 	process.env.DATABASE_LIARA ||
