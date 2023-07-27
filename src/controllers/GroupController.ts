@@ -103,8 +103,8 @@ export default class GroupController extends Controller<typeof Group> {
 
 	@wrapAsync
 	async checkMembers(req: IRequest, res: Response, next: NextFunction) {
-		const tags: any[] = req.body.members || req.body.newMembers || [];
-		tags.map(async (value: { user: any }): Promise<Types.ObjectId> => {
+		const memberArray: any[] = req.body.members || req.body.newMembers || [];
+		memberArray.map(async (value: { user: any }): Promise<Types.ObjectId> => {
 			if (isValidObjectId(value.user)) return value.user;
 			if (typeof value.user === 'string') {
 				const user = await UserController.getUser(value.user);
