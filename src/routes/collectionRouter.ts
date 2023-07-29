@@ -71,8 +71,7 @@ router
 		LibraryController.authorizeAdd,
 		controller.validateBody.create,
 		controller.createOne,
-		controller.sendResponse('create'),
-		controller.debugLog
+		controller.sendResponse('create')
 	);
 
 export default router;

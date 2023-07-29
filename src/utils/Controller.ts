@@ -91,16 +91,6 @@ export default abstract class Controller<DocType extends Model<any>> {
 		this.modelName = this.model.modelName.toLowerCase();
 	}
 
-	debugLog(req: IRequest, res: Response, next: NextFunction) {
-		console.log(
-			`${Date.now()} - ${req.filePath} - File: ${
-				req.file
-			} - BodyKeys: ${Object.keys(req.body)}`
-		);
-		console.log(req.originalUrl);
-		next();
-	}
-
 	/**
 	 * prevents the use of keys that are not valid
 	 * but doesn't guarantee the use of all the keys
