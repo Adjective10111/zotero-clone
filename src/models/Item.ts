@@ -5,7 +5,7 @@ import { ATypeDoc } from './AttachmentType';
 import { type ICollection } from './Collection';
 import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
-import Tag, { TagDoc } from './Tag';
+import { TagDoc } from './Tag';
 
 export interface IItem extends ITimestamped {
 	library: LibraryDoc;
@@ -32,10 +32,7 @@ interface IItemMethods {
 }
 
 interface ItemModel extends Model<IItem, {}, IItemMethods> {
-	searchTag(
-		tag: Types.ObjectId | string,
-		filter: AggregateFilter
-	): Promise<Doc<IItem>[]>;
+	searchTag(tag: Types.ObjectId): Promise<Doc<IItem>[]>;
 }
 export type ItemDoc = Doc<IItem, IItemMethods>;
 
@@ -81,7 +78,7 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 			type: [
 				{
 					type: Types.ObjectId,
-					ref: Tag
+					ref: 'Tag'
 				}
 			],
 			default: []
@@ -127,11 +124,9 @@ itemSchema.methods.relate = async function (
 	await this.save();
 };
 itemSchema.statics.searchTag = async function (
-	tag: Types.ObjectId | string,
-	filter: AggregateFilter
+	tag: Types.ObjectId
 ): Promise<Doc<IItem>[]> {
 	return await Item.aggregate([
-		filter,
 		{
 			$unwind: '$tags'
 		},

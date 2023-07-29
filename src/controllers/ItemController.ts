@@ -87,17 +87,25 @@ export default class ItemController extends Controller<typeof Item> {
 
 	@wrapAsync
 	async checkTags(req: IRequest, res: Response, next: NextFunction) {
-		const tags: any[] = req.body.tags;
-		tags.map(async (value: any): Promise<Types.ObjectId> => {
-			if (isValidObjectId(value)) return value;
-			if (value.name && value.color) {
-				const { name, color } = value;
-				let tag = await Tag.findOne({ name, color });
-				if (!tag) tag = await Tag.create({ name, color });
-				return tag.id;
-			}
-			throw createError(400, 'invalid tags array');
-		});
+		const tags: any[] = req.body.tags || [];
+		req.body.tags = await Promise.all(
+			tags.map(async (value: any): Promise<Types.ObjectId> => {
+				// for id
+				if (isValidObjectId(value)) {
+					const tag = await Tag.findById(value);
+					if (!tag) throw createError(400, 'invalid tags array');
+					return value;
+				}
+				// for { name, color }
+				if (value.name && value.color) {
+					const { name, color } = value;
+					let tag = await Tag.findOne({ user: req.user?.id, name, color });
+					if (!tag) tag = await Tag.create({ user: req.user?.id, name, color });
+					return tag.id;
+				}
+				throw createError(400, 'invalid tags array');
+			})
+		);
 
 		next();
 	}
@@ -106,9 +114,7 @@ export default class ItemController extends Controller<typeof Item> {
 	async searchByTag(req: IRequest, res: Response, next: NextFunction) {
 		const tag = req.params.tag;
 		const libraries = await Library.find({ owner: req.user?.id });
-		req[`${this.modelName}s`] = await Item.searchTag(tag, {
-			$match: { library: { $in: libraries } }
-		});
+		req.items = await Item.searchTag(new Types.ObjectId(tag));
 
 		next();
 	}
