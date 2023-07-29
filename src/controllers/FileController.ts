@@ -20,7 +20,10 @@ export default class FileController {
 					(req: IRequest, file) => `${__dirname}/../private`,
 					(req: IRequest, file) => {
 						let attachment = req.attachment;
-						if (!req.attachment) attachment = req.body;
+						if (!req.attachment) {
+							attachment = req.body;
+							if (req.item) attachment.parent = req.item.id;
+						}
 						const extension = file.originalname.split('.').pop();
 
 						req.filename = `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
