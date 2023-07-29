@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import AttachmentController from '../controllers/AttachmentController';
 import FileController from '../controllers/FileController';
-import ItemController from '../controllers/ItemController';
 import LibraryController from '../controllers/LibraryController';
 
 const router = Router();
