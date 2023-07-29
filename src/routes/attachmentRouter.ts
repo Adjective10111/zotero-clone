@@ -57,9 +57,9 @@ router
 	)
 	.post(
 		LibraryController.authorizeAdd,
+		controller.addItemToBody,
 		fileController.uploadFile,
 		fileController.addFileName('filename'),
-		controller.addItemToBody,
 		controller.validateBody.create,
 		controller.createOne,
 		controller.sendResponse('create')
