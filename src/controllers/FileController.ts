@@ -37,17 +37,14 @@ export default class FileController {
 	uploadFile = this.fileManager.uploader.single('file');
 
 	async downloadFile(req: IRequest, res: Response, next: NextFunction) {
-		res.download(
-			`${req.filePath}/${req.filename}`,
-			req.filename,
-			(err: Error) => {
-				if (err && !res.headersSent)
-					res.status(404).json({
-						status: 'failed',
-						error: 'invalid path'
-					});
-			}
-		);
+		const outName = req.filename.split('-').pop();
+		res.download(`${req.filePath}/${req.filename}`, outName, (err: Error) => {
+			if (err && !res.headersSent)
+				res.status(404).json({
+					status: 'failed',
+					error: 'invalid path'
+				});
+		});
 	}
 
 	resizeProfile = catchAsync(
