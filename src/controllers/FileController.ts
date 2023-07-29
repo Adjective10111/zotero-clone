@@ -24,7 +24,7 @@ export default class FileController {
 						const extension = file.originalname.split('.').pop();
 
 						req.filename = `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
-						return `${attachment.parent}-${attachment.type}-${attachment.name}.${extension}`;
+						return req.filename;
 					}
 				)
 			)
