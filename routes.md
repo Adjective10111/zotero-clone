@@ -235,6 +235,10 @@ adds an item to the collection
 
 fetch collection's items
 
+#### `GET /tag/{tagId}`
+
+fetches all the items with the tag
+
 #### `GET /{id}`
 
 fetch item
