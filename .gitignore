@@ -19,6 +19,9 @@ build/public/*/*
 build/private/*
 !build/private/.mt
 
+# test file
+src/utils/debugger.ts
+
 # test folders
 src/public
 src/private
