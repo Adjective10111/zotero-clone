@@ -1,23 +1,48 @@
 import { Router } from 'express';
+import CollectionController from '../controllers/CollectionController';
+import ItemController from '../controllers/ItemController';
+import LibraryController from '../controllers/LibraryController';
 import TagController from '../controllers/TagController';
 
 const router = Router();
 const controller = new TagController();
 
+const libraryController = new LibraryController();
+const collectionController = new CollectionController();
+const itemController = new ItemController();
+
 router.get(
 	'/',
-	controller.filterByUser,
-	controller.getAll,
+	controller.getTagsOfItemsOfUser,
 	controller.sendResponse('getAll')
 );
+
+router.get('/libraries');
 router.get(
 	'/library/:id',
-	controller.getTagsByParentId('library'),
+	libraryController.getOne,
+	LibraryController.authorizeView,
+	controller.getTagsOfItemsOfLibrary,
 	controller.sendResponse('getAll')
 );
+
+router.get('/collections');
 router.get(
 	'/collection/:id',
-	controller.getTagsByParentId('parentCollection'),
+	collectionController.getOne,
+	CollectionController.addLibToReq,
+	LibraryController.authorizeView,
+	controller.getTagsOfItemsOfCollection,
+	controller.sendResponse('getAll')
+);
+
+router.get('/items');
+router.get(
+	'/item/:id',
+	itemController.getOne,
+	ItemController.addLibToReq,
+	LibraryController.authorizeView,
+	controller.getTagsOfItem,
 	controller.sendResponse('getAll')
 );
 
