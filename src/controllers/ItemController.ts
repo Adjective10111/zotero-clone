@@ -113,7 +113,9 @@ export default class ItemController extends Controller<typeof Item> {
 	@wrapAsync
 	async searchByTag(req: IRequest, res: Response, next: NextFunction) {
 		const tag = req.params.tag;
-		const libraries = await Library.find({ owner: req.user?.id });
+		const tagDoc = (await Tag.findById(tag)) || { user: null };
+		if (tagDoc.user !== req.user?.id)
+			throw createError(403, 'unauthorized access');
 		req.items = await Item.searchTag(new Types.ObjectId(tag));
 
 		next();
