@@ -114,8 +114,6 @@ export default class ItemController extends Controller<typeof Item> {
 	async searchByTag(req: IRequest, res: Response, next: NextFunction) {
 		const tag = req.params.tag;
 		const tagDoc = (await Tag.findById(tag)) || { user: null };
-		console.log(req.user?.id);
-		console.log(tagDoc.user);
 		if (!tagDoc.user?.equals(req.user?.id))
 			throw createError(403, 'unauthorized access');
 
