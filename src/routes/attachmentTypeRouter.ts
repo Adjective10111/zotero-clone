@@ -11,8 +11,8 @@ router
 	.get(controller.getAll, controller.sendResponse('getAll'))
 	.post(
 		fileController.uploadIcon,
-		controller.parseMetadataKeys,
 		controller.validateBody.create,
+		controller.parseMetadataKeys,
 		fileController.resizeIcon,
 		fileController.addFilePath('icon'),
 		controller.createOne,
@@ -23,8 +23,8 @@ router
 	.get(controller.getOne, controller.sendResponse('getOne'))
 	.patch(
 		fileController.uploadIcon,
-		controller.parseMetadataKeys,
 		controller.validateBody.patch,
+		controller.parseMetadataKeys,
 		fileController.resizeIcon,
 		fileController.addFilePath('icon'),
 		controller.patchById,
