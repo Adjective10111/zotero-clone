@@ -1,10 +1,9 @@
 import { Schema, Types, model, type Model } from 'mongoose';
 import { Doc, type ITimestamped } from '../utils/types';
 import { ItemDoc } from './Item';
-import { UserDoc } from './User';
 
 export interface ITag extends ITimestamped {
-	user: UserDoc | Types.ObjectId;
+	item: ItemDoc | Types.ObjectId;
 
 	name: string;
 	color: string;
@@ -17,10 +16,10 @@ export type TagDoc = Doc<ITag, ITagMethods>;
 
 const tagSchema = new Schema<ITag, TagModel, ITagMethods>(
 	{
-		user: {
+		item: {
 			type: Types.ObjectId,
 			required: true,
-			ref: 'User'
+			ref: 'Item'
 		},
 
 		name: {
@@ -41,7 +40,8 @@ const tagSchema = new Schema<ITag, TagModel, ITagMethods>(
 	}
 );
 
-tagSchema.index({ name: 1 });
+tagSchema.index({ item: 1, name: 1 }, { unique: true });
+tagSchema.index({ name: 1, item: 1 });
 
 const Tag = model<ITag, TagModel>('Tag', tagSchema);
 export default Tag;
