@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express';
 import Collection, { AnyCollectionDoc } from '../models/Collection';
 import Item from '../models/Item';
 import Library, { LibraryDoc } from '../models/Library';
-import Tag from '../models/Tag';
+import Tag, { TagDoc } from '../models/Tag';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
@@ -13,10 +13,18 @@ interface ICRequest extends IRequest {
 interface ILRequest extends IRequest {
 	library?: LibraryDoc;
 }
+interface ITRequest extends IRequest {
+	tag?: TagDoc;
+}
 
 export default class TagController extends Controller<typeof Tag> {
 	constructor() {
 		super(Tag);
+	}
+
+	populateItem = this.createPopulateArray({ path: 'item' });
+	addItemToReq(req: ITRequest, res: Response, next: NextFunction) {
+		req.item = req.tag?.item;
 	}
 
 	@wrapAsync

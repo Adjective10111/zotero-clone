@@ -46,4 +46,14 @@ router.get(
 	controller.sendResponse('getAll')
 );
 
+router.delete(
+	'/:id',
+	controller.populateItem,
+	controller.getOne,
+	ItemController.addLibToReq,
+	LibraryController.authorizeEdit,
+	controller.deleteById,
+	controller.sendResponse('delete')
+);
+
 export default router;
