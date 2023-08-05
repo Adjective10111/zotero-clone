@@ -78,7 +78,6 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 
 itemSchema.index({ parentCollection: 1, name: 1 }, { unique: true });
 itemSchema.index({ library: 1, name: 1 });
-itemSchema.index({ tags: 1 });
 
 itemSchema.virtual('attachments', {
 	ref: 'Attachment',
