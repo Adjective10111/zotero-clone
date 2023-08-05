@@ -1,4 +1,4 @@
-import { Schema, Types, model, type Model } from 'mongoose';
+import { PipelineStage, Schema, Types, model, type Model } from 'mongoose';
 import { type Doc, type ITimestamped } from '../utils/types';
 import { type AttachmentDoc } from './Attachment';
 import { ATypeDoc } from './AttachmentType';
@@ -23,17 +23,11 @@ export interface IItem extends ITimestamped {
 	tags: TagDoc[];
 }
 
-type AggregateFilter = {
-	$match: object;
-};
-
 interface IItemMethods {
 	relate(doc: Doc<IItem> | Types.ObjectId): Promise<void>;
 }
 
-interface ItemModel extends Model<IItem, {}, IItemMethods> {
-	searchTag(tag: Types.ObjectId): Promise<Doc<IItem>[]>;
-}
+interface ItemModel extends Model<IItem, {}, IItemMethods> {}
 export type ItemDoc = Doc<IItem, IItemMethods>;
 
 const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
@@ -122,18 +116,6 @@ itemSchema.methods.relate = async function (
 
 	await doc.save();
 	await this.save();
-};
-itemSchema.statics.searchTag = async function (
-	tag: Types.ObjectId
-): Promise<Doc<IItem>[]> {
-	return await Item.aggregate([
-		{
-			$unwind: '$tags'
-		},
-		{
-			$match: { tags: tag }
-		}
-	]).exec();
 };
 
 itemSchema.pre('save', function (next) {

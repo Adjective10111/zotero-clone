@@ -116,7 +116,15 @@ export default class ItemController extends Controller<typeof Item> {
 		const tagDoc = (await Tag.findById(tag)) || { user: null };
 		if (tagDoc.user !== req.user?.id)
 			throw createError(403, 'unauthorized access');
-		req.items = await Item.searchTag(new Types.ObjectId(tag));
+
+		req.items = await Item.aggregate([
+			{
+				$unwind: '$tags'
+			},
+			{
+				$match: { tags: new Types.ObjectId(tag) }
+			}
+		]).exec();
 
 		next();
 	}
