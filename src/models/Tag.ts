@@ -2,6 +2,11 @@ import { Schema, Types, model, type Model } from 'mongoose';
 import { Doc, type ITimestamped } from '../utils/types';
 import { ItemDoc } from './Item';
 
+export interface TagObject {
+	name: string;
+	color: string;
+}
+
 export interface ITag extends ITimestamped {
 	item: ItemDoc | Types.ObjectId;
 
