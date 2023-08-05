@@ -26,12 +26,6 @@ router.use(
 // // TODO: complete sync
 // router.route('/sync').get().post().patch().delete();
 
-router.get(
-	'/tag/:tag',
-	controller.searchByTags,
-	controller.sendResponse('getAll')
-);
-
 router
 	.route('/')
 	.get(
