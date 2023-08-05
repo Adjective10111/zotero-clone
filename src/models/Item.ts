@@ -1,11 +1,10 @@
-import { PipelineStage, Schema, Types, model, type Model } from 'mongoose';
+import { Schema, Types, model, type Model } from 'mongoose';
 import { type Doc, type ITimestamped } from '../utils/types';
 import { type AttachmentDoc } from './Attachment';
 import { ATypeDoc } from './AttachmentType';
 import { type ICollection } from './Collection';
 import { type LibraryDoc } from './Library';
 import { type INote } from './Note';
-import { TagDoc } from './Tag';
 
 export interface IItem extends ITimestamped {
 	library: LibraryDoc;
@@ -20,7 +19,6 @@ export interface IItem extends ITimestamped {
 	notes?: INote[];
 
 	related: ({ name: string; item: IItem } | IItem)[];
-	tags: TagDoc[];
 }
 
 interface IItemMethods {
@@ -64,15 +62,6 @@ const itemSchema = new Schema<IItem, ItemModel, IItemMethods>(
 				{
 					name: String,
 					item: { type: Types.ObjectId, ref: 'Item' }
-				}
-			],
-			default: []
-		},
-		tags: {
-			type: [
-				{
-					type: Types.ObjectId,
-					ref: 'Tag'
 				}
 			],
 			default: []
