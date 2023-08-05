@@ -162,10 +162,6 @@ fetches all the public libraries that are in our app
 
 retrieves the user's libraries
 
-#### `GET /tag/{tagId}`
-
-fetches all the libraries that contain at least an item with the given tag
-
 #### `POST /`
 
 create a library
@@ -241,16 +237,12 @@ adds an item to the collection
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tags': TagObject[] - { name: string, color: string } | ObjectId of the tag
+  - 'tags': TagObject[] - { name: string, color: string }
   - 'related': Item[]
 
 #### `GET ../collections/{id}/items`
 
 fetch collection's items
-
-#### `GET /tag/{tagId}`
-
-fetches all the items with the tag
 
 #### `GET /{id}`
 
@@ -266,7 +258,7 @@ patch item
   - 'primaryAttachment': attachment - the attachment which's metadata will be used
   - 'itemType': itemType - default: undefined type's id
   - 'metadata': object
-  - 'tags': TagObject[] - { name: string, color: string } | ObjectId of the tag
+  - 'tags': TagObject[] - { name: string, color: string }
   - 'related': Item[]
 
 #### `DELETE /{id}`
@@ -277,7 +269,31 @@ delete item
 
 #### `GET /`
 
-fetches all the available tags
+fetches all of user's tags
+
+#### `GET /library/{id}`
+
+fetches all the tags of items of the library
+
+#### `GET /collection/{id}`
+
+fetches all the tags of items of the collection
+
+#### `GET /item/{id}`
+
+fetches all the tags of the item
+
+<!-- #### `GET /libraries`
+
+fetches all the libraries that contain at least an item with the given tag
+
+#### `GET /collections`
+
+fetches all the collections that contain at least an item with the given tag
+
+#### `GET /items`
+
+fetches all the items with the tag -->
 
 ### /attachments
 
