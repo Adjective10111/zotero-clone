@@ -138,11 +138,13 @@ export default class LibraryController extends Controller<typeof Library> {
 		next();
 	}
 
+	@wrapAsync
 	async initializeLibrary(req: ILRequest, res: Response, next: NextFunction) {
 		await req.library?.initialize();
 		next();
 	}
 
+	@wrapAsync
 	async emptyBin(req: ILRequest, res: Response, next: NextFunction) {
 		await req.library?.emptyBin();
 		next();
