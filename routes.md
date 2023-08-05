@@ -412,4 +412,4 @@ for example:
 
 ```GET api/aGetAllLink?aKey[gte]=5``` - it gets all the data provided by *`api/aGetAllLink`* and filtered by the ones having *aKey* value greater than or equal to 5.
 
-```GET api/aGetAllLink?aKey[ne]=science&anotherKey[eq]=bachelor``` - it filters by the ones having *aKey* value not equal to **'science'** and *anotherKey* equal to **'bachelor'**.
+```GET api/aGetAllLink?aKey[ne]=science&anotherKey=bachelor``` - it filters by the ones having *aKey* value not equal to **'science'** and *anotherKey* equal to **'bachelor'**.
