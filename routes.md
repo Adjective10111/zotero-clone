@@ -162,6 +162,10 @@ fetches all the public libraries that are in our app
 
 retrieves the user's libraries
 
+#### `GET /tag/{tagId}`
+
+fetches all the libraries that contain at least an item with the given tag
+
 #### `POST /`
 
 create a library

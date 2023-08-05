@@ -2,7 +2,9 @@ import { NextFunction, Response } from 'express';
 import { Types } from 'mongoose';
 import Collection from '../models/Collection';
 import Group from '../models/Group';
+import Item from '../models/Item';
 import Library, { type LibraryDoc } from '../models/Library';
+import Tag from '../models/Tag';
 import Controller from '../utils/Controller';
 import { catchAsync, createError, wrapAsync } from '../utils/errorFactory';
 import { IFilterRequest, IRequest } from '../utils/types';
@@ -147,6 +149,44 @@ export default class LibraryController extends Controller<typeof Library> {
 	@wrapAsync
 	async emptyBin(req: ILRequest, res: Response, next: NextFunction) {
 		await req.library?.emptyBin();
+		next();
+	}
+
+	@wrapAsync
+	async searchByTags(req: IRequest, res: Response, next: NextFunction) {
+		const tag = req.params.tag;
+		const tagDoc = (await Tag.findById(tag)) || { user: null };
+		if (!tagDoc.user?.equals(req.user?.id))
+			throw createError(403, 'unauthorized access');
+
+		const aggregation = await Item.aggregate([
+			{
+				$unwind: '$tags'
+			},
+			{
+				$match: { tags: new Types.ObjectId(tag) }
+			},
+			{
+				$group: {
+					_id: '$library'
+				}
+			},
+			{
+				$lookup: {
+					from: 'libraries',
+					localField: '_id',
+					foreignField: '_id',
+					as: 'libraries'
+				}
+			}
+		]).exec();
+
+		const libraries: object[] = [];
+		aggregation.forEach(value => {
+			libraries.push(...value.libraries);
+		});
+		req[`${'library'}s`] = libraries;
+
 		next();
 	}
 }
