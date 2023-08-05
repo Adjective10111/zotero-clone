@@ -27,12 +27,6 @@ router.use(
 	noteRouter
 );
 
-router.get(
-	'/tag/:tag',
-	controller.searchByTag,
-	controller.sendResponse('getAll')
-);
-
 router
 	.route('/:id')
 	.get(
