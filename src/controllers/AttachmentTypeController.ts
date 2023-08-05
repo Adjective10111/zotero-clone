@@ -27,10 +27,11 @@ export default class AttachmentTypeController extends Controller<
 
 	parseMetadataKeys(req: IRequest, res: Response, next: NextFunction) {
 		const keys = req.body.metadataKeys;
-		if (typeof keys === 'string')
-			req.body.metadataKeys = keys.split(',');
+		if (typeof keys === 'string') req.body.metadataKeys = keys.split(',');
 		else if (!keys.length)
-			return next(createError(401, 'metadataKeys must be of type string or array'));
+			return next(
+				createError(401, 'metadataKeys must be of type string or array')
+			);
 
 		next();
 	}
