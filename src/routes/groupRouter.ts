@@ -2,6 +2,7 @@ import { Router } from 'express';
 import FileController from '../controllers/FileController';
 import GroupController from '../controllers/GroupController';
 import UserController from '../controllers/UserController';
+import { debugLog } from '../utils/debugger';
 
 const router = Router();
 const controller = new GroupController();
@@ -27,8 +28,8 @@ router
 	.post(
 		fileController.uploadLogo,
 		controller.addOwner,
-		controller.checkMembers,
 		controller.validateBody.create,
+		controller.checkMembers,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
 		controller.createOne,
@@ -47,8 +48,8 @@ router
 		controller.getOne,
 		controller.authorizeEdit,
 		fileController.uploadLogo,
-		controller.checkMembers,
 		controller.validateBody.patch,
+		controller.checkMembers,
 		fileController.resizeLogo,
 		fileController.addFilePath('logo'),
 		controller.patchDocument,

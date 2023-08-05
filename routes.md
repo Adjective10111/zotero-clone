@@ -109,11 +109,15 @@ creates a group
   - 'owner': user - will be filled automatically
 - allowed:
   - 'logo': image file
-  - 'members' - an array of:
+  - 'members' - a JSON string representing an array of:
     - user: userId | email
     - canAdd: boolean
     - canEdit: boolean
     - canDelete: boolean
+
+    if you do not provide a 'can{access}' key, the default value will be set:
+    - canAdd: true
+    - canEdit & canDelete: false
 
 #### `GET /{id}`
 
@@ -126,16 +130,21 @@ patches the group with specified id
 - allowed:
   - 'logo': image file
   - 'name': string
-  - 'members' - an array of:
+  - 'members' - a JSON string representing an array of:
     - user: userId | email
     - canAdd: boolean
     - canEdit: boolean
     - canDelete: boolean
-  - 'newMembers' - an array of objects with properties below, that will be added to members:
+  - 'newMembers' - a JSON string representing an array of objects with properties below, that will be added to members:
     - user: userId | email
     - canAdd: boolean
     - canEdit: boolean
     - canDelete: boolean
+
+if you do not provide a 'can{access}' key, the default value will be set:
+
+- canAdd: true
+- canEdit & canDelete: false
 
 ##### either use 'members' or 'newMembers' - DO NOT USE THEM BOTH
 

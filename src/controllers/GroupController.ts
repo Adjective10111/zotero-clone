@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import Group, { GroupDoc, Member } from '../models/Group';
-import { LibraryDoc } from '../models/Library';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
@@ -103,16 +102,26 @@ export default class GroupController extends Controller<typeof Group> {
 
 	@wrapAsync
 	async checkMembers(req: IRequest, res: Response, next: NextFunction) {
-		const memberArray: any[] = req.body.members || req.body.newMembers || [];
-		memberArray.map(async (value: { user: any }): Promise<Types.ObjectId> => {
-			if (isValidObjectId(value.user)) return value.user;
-			if (typeof value.user === 'string') {
-				const user = await UserController.getUser(value.user);
-				if (!user) throw createError(400, 'invalid data in array');
-				return user.id;
-			}
-			throw createError(400, 'invalid members array');
-		});
+		const memberArray: any[] = JSON.parse(req.body.members || '[]');
+
+		try {
+			req.body.members = await Promise.all(
+				memberArray.map(
+					async (value: { user: any }): Promise<{ user: Types.ObjectId }> => {
+						if (isValidObjectId(value.user)) return value;
+						if (typeof value.user === 'string') {
+							const user = await UserController.getUser(value.user);
+							if (!user) throw createError(400, 'invalid data in array');
+							value.user = user.id;
+							return value;
+						}
+						throw createError(400, 'invalid members array');
+					}
+				)
+			);
+		} catch (err) {
+			return next(err);
+		}
 
 		next();
 	}
