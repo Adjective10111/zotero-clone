@@ -283,17 +283,26 @@ fetches all the tags of items of the collection
 
 fetches all the tags of the item
 
-<!-- #### `GET /libraries`
+#### `GET /libraries`
 
 fetches all the libraries that contain at least an item with the given tag
+
+- mandatory:
+  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
 
 #### `GET /collections`
 
 fetches all the collections that contain at least an item with the given tag
 
+- mandatory:
+  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
+
 #### `GET /items`
 
-fetches all the items with the tag -->
+fetches all the items with the tag
+
+- mandatory:
+  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
 
 ### /attachments
 
