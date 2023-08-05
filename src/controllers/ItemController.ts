@@ -109,23 +109,4 @@ export default class ItemController extends Controller<typeof Item> {
 
 		next();
 	}
-
-	@wrapAsync
-	async searchByTag(req: IRequest, res: Response, next: NextFunction) {
-		const tag = req.params.tag;
-		const tagDoc = (await Tag.findById(tag)) || { user: null };
-		if (!tagDoc.user?.equals(req.user?.id))
-			throw createError(403, 'unauthorized access');
-
-		req.items = await Item.aggregate([
-			{
-				$unwind: '$tags'
-			},
-			{
-				$match: { tags: new Types.ObjectId(tag) }
-			}
-		]).exec();
-
-		next();
-	}
 }

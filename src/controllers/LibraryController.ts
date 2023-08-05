@@ -151,42 +151,4 @@ export default class LibraryController extends Controller<typeof Library> {
 		await req.library?.emptyBin();
 		next();
 	}
-
-	@wrapAsync
-	async searchByTags(req: IRequest, res: Response, next: NextFunction) {
-		const tag = req.params.tag;
-		const tagDoc = (await Tag.findById(tag)) || { user: null };
-		if (!tagDoc.user?.equals(req.user?.id))
-			throw createError(403, 'unauthorized access');
-
-		const aggregation = await Item.aggregate([
-			{
-				$unwind: '$tags'
-			},
-			{
-				$match: { tags: new Types.ObjectId(tag) }
-			},
-			{
-				$group: {
-					_id: '$library'
-				}
-			},
-			{
-				$lookup: {
-					from: 'libraries',
-					localField: '_id',
-					foreignField: '_id',
-					as: 'libraries'
-				}
-			}
-		]).exec();
-
-		const libraries: object[] = [];
-		aggregation.forEach(value => {
-			libraries.push(...value.libraries);
-		});
-		req[`${'library'}s`] = libraries;
-
-		next();
-	}
 }
