@@ -11,13 +11,12 @@ const libraryController = new LibraryController();
 const collectionController = new CollectionController();
 const itemController = new ItemController();
 
+// fetching tags of
 router.get(
 	'/',
 	controller.getTagsOfItemsOfUser,
 	controller.sendResponse('getAll')
 );
-
-router.get('/libraries');
 router.get(
 	'/library/:id',
 	libraryController.getOne,
@@ -25,8 +24,6 @@ router.get(
 	controller.getTagsOfItemsOfLibrary,
 	controller.sendResponse('getAll')
 );
-
-router.get('/collections');
 router.get(
 	'/collection/:id',
 	collectionController.getOne,
@@ -35,8 +32,6 @@ router.get(
 	controller.getTagsOfItemsOfCollection,
 	controller.sendResponse('getAll')
 );
-
-router.get('/items');
 router.get(
 	'/item/:id',
 	itemController.getOne,
@@ -46,6 +41,24 @@ router.get(
 	controller.sendResponse('getAll')
 );
 
+// searching by tags
+router.get(
+	'/libraries',
+	controller.getLibrariesByTags,
+	libraryController.sendResponse('getAll')
+);
+router.get(
+	'/collections',
+	controller.getCollectionsByTags,
+	collectionController.sendResponse('getAll')
+);
+router.get(
+	'/items',
+	controller.getItemsByTags,
+	itemController.sendResponse('getAll')
+);
+
+// deletion
 router.delete(
 	'/:id',
 	controller.populateItem,

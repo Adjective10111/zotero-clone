@@ -1,4 +1,5 @@
 import { NextFunction, Response } from 'express';
+import { PipelineStage, type ObjectId } from 'mongoose';
 import Collection, { AnyCollectionDoc } from '../models/Collection';
 import Item from '../models/Item';
 import Library, { LibraryDoc } from '../models/Library';
@@ -172,61 +173,244 @@ export default class TagController extends Controller<typeof Tag> {
 		next();
 	}
 
-	// @wrapAsync
-	// async getItemsByTags(req: IRequest, res: Response, next: NextFunction) {
-	// 	const tag = req.params.tag;
-	// 	const tagDoc = (await Tag.findById(tag)) || { user: null };
-	// 	if (!tagDoc.user?.equals(req.user?.id))
-	// 		throw createError(403, 'unauthorized access');
+	@wrapAsync
+	async getLibrariesByTags(req: IRequest, res: Response, next: NextFunction) {
+		const tags = req.body.tagNames;
 
-	// 	req.items = await Item.aggregate([
-	// 		{
-	// 			$unwind: '$tags'
-	// 		},
-	// 		{
-	// 			$match: { tags: new Types.ObjectId(tag) }
-	// 		}
-	// 	]).exec();
+		const libraries = await Library.aggregate([
+			{
+				$match: { owner: req.user?.id }
+			},
+			{
+				$lookup: {
+					from: 'items',
+					let: {
+						libraryId: '$_id'
+					},
+					pipeline: [
+						// getting all the library's items
+						{
+							$match: { library: '$$libraryId' }
+						},
+						{
+							$project: { _id: 1 }
+						},
+						// getting their tags
+						{
+							$lookup: {
+								from: 'tags',
+								let: {
+									itemId: '$_id'
+								},
+								pipeline: [
+									{
+										$match: {
+											$expr: {
+												$and: [
+													{
+														$eq: ['$item', '$$itemId']
+													},
+													{
+														$in: ['$name', tags]
+													}
+												]
+											}
+										}
+									}
+								],
+								as: 'tags'
+							}
+						},
+						// replacing tags as the root
+						{
+							$unwind: '$tags'
+						},
+						{
+							$replaceWith: '$tags'
+						},
+						// grouping the tags with the same name
+						{
+							$group: {
+								_id: '$name',
+								color: {
+									$first: '$color'
+								}
+							}
+						}
+					],
+					as: 'tags'
+				}
+			},
+			// remove the ones with no tag with those conditions
+			{
+				$match: {
+					$expr: {
+						$gt: [{ $size: '$tags' }, 0]
+					}
+				}
+			}
+		]).exec();
 
-	// 	next();
-	// }
-	// @wrapAsync
-	// async getCollectionsByTags(req: IRequest, res: Response, next: NextFunction) {}
-	// @wrapAsync
-	// async getLibrariesByTags(req: IRequest, res: Response, next: NextFunction) {
-	// 	const tag = req.params.tag;
-	// 	const tagDoc = (await Tag.findById(tag)) || { user: null };
-	// 	if (!tagDoc.user?.equals(req.user?.id))
-	// 		throw createError(403, 'unauthorized access');
+		req[`${'library'}s`] = libraries;
+		next();
+	}
+	@wrapAsync
+	async getCollectionsByTags(req: IRequest, res: Response, next: NextFunction) {
+		const tags = req.body.tagNames;
 
-	// 	const aggregation = await Item.aggregate([
-	// 		{
-	// 			$unwind: '$tags'
-	// 		},
-	// 		{
-	// 			$match: { tags: new Types.ObjectId(tag) }
-	// 		},
-	// 		{
-	// 			$group: {
-	// 				_id: '$library'
-	// 			}
-	// 		},
-	// 		{
-	// 			$lookup: {
-	// 				from: 'libraries',
-	// 				localField: '_id',
-	// 				foreignField: '_id',
-	// 				as: 'libraries'
-	// 			}
-	// 		}
-	// 	]).exec();
+		const collections = await Library.aggregate([
+			{
+				$match: { owner: req.user?.id }
+			},
+			{
+				$lookup: {
+					from: 'items',
+					let: {
+						libraryId: '$_id'
+					},
+					pipeline: [
+						// getting all the library's items
+						{
+							$match: { library: '$$libraryId' }
+						},
+						// getting their tags
+						{
+							$lookup: {
+								from: 'tags',
+								let: {
+									itemId: '$_id'
+								},
+								pipeline: [
+									{
+										$match: {
+											$expr: {
+												$and: [
+													{
+														$eq: ['$item', '$$itemId']
+													},
+													{
+														$in: ['$name', tags]
+													}
+												]
+											}
+										}
+									}
+								],
+								as: 'tags'
+							}
+						},
+						// remove the ones with no tag with those conditions
+						{
+							$match: {
+								$expr: {
+									$gt: [{ $size: '$tags' }, 0]
+								}
+							}
+						}
+					],
+					as: 'items'
+				}
+			},
+			// replace items as the root
+			{
+				$unwind: '$items'
+			},
+			{
+				$replaceWith: '$items'
+			},
+			// group by parentCollection to avoid duplicates
+			{
+				$group: {
+					_id: '$parentCollection'
+				}
+			},
+			// lookup and replace collections as root
+			{
+				$lookup: {
+					from: 'collections',
+					localField: '_id',
+					foreignField: '_id',
+					as: 'collections'
+				}
+			},
+			{
+				$unwind: '$collections'
+			},
+			{
+				$replaceWith: '$collections'
+			}
+		]).exec();
 
-	// 	const libraries: object[] = [];
-	// 	aggregation.forEach(value => {
-	// 		libraries.push(...value.libraries);
-	// 	});
-	// 	req[`${'library'}s`] = libraries;
+		req.collections = collections;
+		next();
+	}
+	@wrapAsync
+	async getItemsByTags(req: IRequest, res: Response, next: NextFunction) {
+		const tags = req.body.tagNames;
 
-	// 	next();
-	// }
+		const items = await Library.aggregate([
+			{
+				$match: { owner: req.user?.id }
+			},
+			{
+				$lookup: {
+					from: 'items',
+					let: {
+						libraryId: '$_id'
+					},
+					pipeline: [
+						// getting all the library's items
+						{
+							$match: { library: '$$libraryId' }
+						},
+						// getting their tags
+						{
+							$lookup: {
+								from: 'tags',
+								let: {
+									itemId: '$_id'
+								},
+								pipeline: [
+									{
+										$match: {
+											$expr: {
+												$and: [
+													{
+														$eq: ['$item', '$$itemId']
+													},
+													{
+														$in: ['$name', tags]
+													}
+												]
+											}
+										}
+									}
+								],
+								as: 'tags'
+							}
+						},
+						// remove the ones with no tag with those conditions
+						{
+							$match: {
+								$expr: {
+									$gt: [{ $size: '$tags' }, 0]
+								}
+							}
+						}
+					],
+					as: 'items'
+				}
+			},
+			// replace items as the root
+			{
+				$unwind: '$items'
+			},
+			{
+				$replaceWith: '$items'
+			}
+		]).exec();
+
+		req.items = items;
+		next();
+	}
 }
