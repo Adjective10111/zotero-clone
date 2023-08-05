@@ -43,8 +43,9 @@ router
 		ItemController.addLibToReq,
 		LibraryController.authorizeEdit,
 		controller.validateBody.patch,
-		controller.checkTags,
+		controller.removeTagsFromBody,
 		controller.patchDocument,
+		controller.checkTags,
 		controller.sendResponse('patch')
 	)
 	.delete(
@@ -52,6 +53,7 @@ router
 		controller.getOne,
 		ItemController.addLibToReq,
 		LibraryController.authorizeDelete,
+		controller.deleteTags,
 		controller.deleteDocument,
 		controller.sendResponse('delete')
 	);
@@ -71,8 +73,9 @@ router
 		controller.addLibraryToBodyFromCollection,
 		controller.addCollectionToBody,
 		controller.validateBody.create,
-		controller.checkTags,
+		controller.removeTagsFromBody,
 		controller.createOne,
+		controller.checkTags,
 		controller.sendResponse('create')
 	);
 

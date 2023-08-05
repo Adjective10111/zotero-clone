@@ -1,8 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import Item, { ItemDoc } from '../models/Item';
-import Library from '../models/Library';
-import Tag from '../models/Tag';
+import Tag, { TagObject } from '../models/Tag';
 import Controller from '../utils/Controller';
 import { createError, wrapAsync } from '../utils/errorFactory';
 import { IRequest } from '../utils/types';
@@ -85,28 +84,32 @@ export default class ItemController extends Controller<typeof Item> {
 		next();
 	}
 
+	removeTagsFromBody(req: IRequest, res: Response, next: NextFunction) {
+		req.tags = req.body.tags;
+		req.body.tags = undefined;
+		next();
+	}
+
 	@wrapAsync
-	async checkTags(req: IRequest, res: Response, next: NextFunction) {
-		const tags: any[] = req.body.tags || [];
-		req.body.tags = await Promise.all(
-			tags.map(async (value: any): Promise<Types.ObjectId> => {
-				// for id
-				if (isValidObjectId(value)) {
-					const tag = await Tag.findById(value);
-					if (!tag) throw createError(400, 'invalid tags array');
-					return value;
-				}
-				// for { name, color }
-				if (value.name && value.color) {
-					const { name, color } = value;
-					let tag = await Tag.findOne({ user: req.user?.id, name, color });
-					if (!tag) tag = await Tag.create({ user: req.user?.id, name, color });
-					return tag.id;
-				}
-				throw createError(400, 'invalid tags array');
+	async checkTags(req: IIRequest, res: Response, next: NextFunction) {
+		const tags: TagObject[] = req.tags || [];
+		await Promise.all(
+			tags.map(async (value: any): Promise<void> => {
+				if (!value.name || !value.color)
+					throw createError(400, 'invalid tags array');
+
+				const { name, color } = value;
+				let tag = await Tag.findOne({ item: req.item?.id, name, color });
+				if (!tag) tag = await Tag.create({ item: req.item?.id, name, color });
 			})
 		);
 
+		next();
+	}
+
+	@wrapAsync
+	async deleteTags(req: IIRequest, res: Response, next: NextFunction) {
+		await Tag.deleteMany({ item: req.item?.id });
 		next();
 	}
 }
