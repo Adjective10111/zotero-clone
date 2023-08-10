@@ -30,10 +30,7 @@ export default class TagController extends Controller<typeof Tag> {
 
 	@wrapAsync
 	async getTagsOfItem(req: IRequest, res: Response, next: NextFunction) {
-		req.tags = await Tag.find(
-			{ item: req.params.id },
-			{ name: 1, color: 1, item: 0 }
-		);
+		req.tags = await Tag.find({ item: req.params.id }, { name: 1, color: 1 });
 		next();
 	}
 	@wrapAsync
