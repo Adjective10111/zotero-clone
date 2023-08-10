@@ -46,10 +46,19 @@ export default class TagController extends Controller<typeof Tag> {
 		else await req.collection.populate('items');
 
 		const itemIds = req.collection.items?.map(value => value._id);
-		req.tags = await Tag.find(
-			{ item: { $in: itemIds } },
-			{ name: 1, color: 1, item: 0 }
-		);
+		req.tags = await Tag.aggregate([
+			{
+				$match: { item: { $in: itemIds } }
+			},
+			{
+				$group: {
+					_id: '$name',
+					color: {
+						$first: '$color'
+					}
+				}
+			}
+		]);
 
 		next();
 	}
