@@ -43,7 +43,7 @@ export default class TagController extends Controller<typeof Tag> {
 
 		if (Collection.isSearchingCollection(req.collection))
 			await req.collection.searchItems();
-		else req.collection.populate('items');
+		else await req.collection.populate('items');
 
 		const itemIds = req.collection.items?.map(value => value._id);
 		req.tags = await Tag.find(
@@ -64,7 +64,7 @@ export default class TagController extends Controller<typeof Tag> {
 		req.tags = await Item.aggregate([
 			// getting all the library's items
 			{
-				$match: { library: req.library.id }
+				$match: { library: req.library._id }
 			},
 			{
 				$project: { _id: 1 }
@@ -105,7 +105,7 @@ export default class TagController extends Controller<typeof Tag> {
 		req.tags = await Library.aggregate([
 			// getting libraries owned by user
 			{
-				$match: { owner: req.user.id }
+				$match: { owner: req.user._id }
 			},
 			{
 				$project: { _id: 1 }
@@ -176,7 +176,7 @@ export default class TagController extends Controller<typeof Tag> {
 
 		const libraries = await Library.aggregate([
 			{
-				$match: { owner: req.user?.id }
+				$match: { owner: req.user?._id }
 			},
 			{
 				$lookup: {
@@ -257,7 +257,7 @@ export default class TagController extends Controller<typeof Tag> {
 
 		const collections = await Library.aggregate([
 			{
-				$match: { owner: req.user?.id }
+				$match: { owner: req.user?._id }
 			},
 			{
 				$lookup: {
@@ -347,7 +347,7 @@ export default class TagController extends Controller<typeof Tag> {
 
 		const items = await Library.aggregate([
 			{
-				$match: { owner: req.user?.id }
+				$match: { owner: req.user?._id }
 			},
 			{
 				$lookup: {
