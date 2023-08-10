@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { PipelineStage, type ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 import Collection, { AnyCollectionDoc } from '../models/Collection';
 import Item from '../models/Item';
 import Library, { LibraryDoc } from '../models/Library';
@@ -196,7 +196,7 @@ export default class TagController extends Controller<typeof Tag> {
 					pipeline: [
 						// getting all the library's items
 						{
-							$match: { library: '$$libraryId' }
+							$match: { $expr: { $eq: ['$library', '$$libraryId'] } }
 						},
 						{
 							$project: { _id: 1 }
@@ -277,7 +277,7 @@ export default class TagController extends Controller<typeof Tag> {
 					pipeline: [
 						// getting all the library's items
 						{
-							$match: { library: '$$libraryId' }
+							$match: { $expr: { $eq: ['$library', '$$libraryId'] } }
 						},
 						// getting their tags
 						{
@@ -367,7 +367,9 @@ export default class TagController extends Controller<typeof Tag> {
 					pipeline: [
 						// getting all the library's items
 						{
-							$match: { library: '$$libraryId' }
+							$match: {
+								$expr: { $eq: ['$library', '$$libraryId'] }
+							}
 						},
 						// getting their tags
 						{
