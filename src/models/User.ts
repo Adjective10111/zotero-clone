@@ -77,7 +77,7 @@ userSchema.methods.addBlackToken = async function (
 ) {
 	if (!this.blackTokens) this.blackTokens = [];
 	this.blackTokens.push({ token, issuedAt, expiration });
-	this.blackTokens.filter((tObj: BlackToken) =>
+	this.blackTokens = this.blackTokens.filter((tObj: BlackToken) =>
 		!tObj.expiration ? true : tObj.expiration > Date.now()
 	);
 	await this.save();
