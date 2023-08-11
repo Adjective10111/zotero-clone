@@ -283,26 +283,29 @@ fetches all the tags of items of the collection
 
 fetches all the tags of the item
 
-#### `GET /libraries`
+#### `GET /libraries?{tagNames}`
 
 fetches all the libraries that contain at least an item with the given tag
 
-- mandatory:
-  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
+tagNames should be either a query param as: `?name1,name2,...,nameN` or an array in the body with name: `{ tagNames: [names] }`
 
-#### `GET /collections`
+###### the body one has priority
+
+#### `GET /collections?{tagNames}`
 
 fetches all the collections that contain at least an item with the given tag
 
-- mandatory:
-  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
+tagNames should be either a query param as: `?name1,name2,...,nameN` or an array in the body with name: `{ tagNames: [names] }`
 
-#### `GET /items`
+###### the body one has priority
+
+#### `GET /items?{tagNames}`
 
 fetches all the items with the tag
 
-- mandatory:
-  - 'tagNames': string[] - an array of the tag names you want to search by *-- yes, no color is need, color is only used for visual effects --*
+tagNames should be either a query param as: `?name1,name2,...,nameN` or an array in the body with name: `{ tagNames: [names] }`
+
+###### the body one has priority
 
 ### /attachments
 
