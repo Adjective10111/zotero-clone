@@ -181,7 +181,8 @@ export default class TagController extends Controller<typeof Tag> {
 
 	@wrapAsync
 	async getLibrariesByTags(req: IRequest, res: Response, next: NextFunction) {
-		const tags = req.body.tagNames;
+		const tags: string[] =
+			req.body.tagNames || Object.keys(req.query).pop()?.split(',') || [];
 
 		const libraries = await Library.aggregate([
 			{
@@ -251,7 +252,7 @@ export default class TagController extends Controller<typeof Tag> {
 			{
 				$match: {
 					$expr: {
-						$gt: [{ $size: '$tags' }, 0]
+						$gte: [{ $size: '$tags' }, tags.length]
 					}
 				}
 			}
@@ -262,7 +263,8 @@ export default class TagController extends Controller<typeof Tag> {
 	}
 	@wrapAsync
 	async getCollectionsByTags(req: IRequest, res: Response, next: NextFunction) {
-		const tags = req.body.tagNames;
+		const tags: string[] =
+			req.body.tagNames || Object.keys(req.query).pop()?.split(',') || [];
 
 		const collections = await Library.aggregate([
 			{
@@ -309,7 +311,7 @@ export default class TagController extends Controller<typeof Tag> {
 						{
 							$match: {
 								$expr: {
-									$gt: [{ $size: '$tags' }, 0]
+									$gte: [{ $size: '$tags' }, tags.length]
 								}
 							}
 						}
@@ -352,7 +354,8 @@ export default class TagController extends Controller<typeof Tag> {
 	}
 	@wrapAsync
 	async getItemsByTags(req: IRequest, res: Response, next: NextFunction) {
-		const tags = req.body.tagNames;
+		const tags: string[] =
+			req.body.tagNames || Object.keys(req.query).pop()?.split(',') || [];
 
 		const items = await Library.aggregate([
 			{
@@ -401,7 +404,7 @@ export default class TagController extends Controller<typeof Tag> {
 						{
 							$match: {
 								$expr: {
-									$gt: [{ $size: '$tags' }, 0]
+									$gte: [{ $size: '$tags' }, tags.length]
 								}
 							}
 						}
