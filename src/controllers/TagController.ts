@@ -40,8 +40,8 @@ export default class TagController extends Controller<typeof Tag> {
 	) {
 		if (!req.collection) throw createError(404, 'No Collection Found');
 
-		if (Collection.isSearchingCollection(req.collection))
-			await req.collection.searchItems();
+		if (Collection.isSearchingCollection(req.collection as any))
+			await (req.collection as any).searchItems();
 		else await req.collection.populate('items');
 
 		const itemIds = req.collection.items?.map(value => value._id);

@@ -116,7 +116,7 @@ export default class LibraryController extends Controller<typeof Library> {
 	}
 
 	static async deleteCollections(lib?: LibraryDoc) {
-		await lib?.collections?.forEach(async collection => {
+		await lib?.collections?.forEach(async (collection: any) => {
 			if (Collection.isCollection(collection)) await collection.empty();
 			await collection.deleteOne();
 		});

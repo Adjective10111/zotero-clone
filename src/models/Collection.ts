@@ -37,8 +37,10 @@ interface CollectionMethods {
 interface CollectionModel extends Model<AnyCollection, {}, CollectionMethods> {
 	isSearchingCollection(
 		doc: Doc<AnyCollection>
-	): doc is Doc<ISearchingCollection>;
-	isCollection(doc: Doc<AnyCollection>): doc is Doc<ICollection>;
+	): doc is Doc<ISearchingCollection, CollectionMethods>;
+	isCollection(
+		doc: Doc<AnyCollection>
+	): doc is Doc<ICollection, CollectionMethods>;
 }
 
 export type AnyCollectionDoc = Doc<AnyCollection, CollectionMethods>;
@@ -125,12 +127,12 @@ collectionSchema.methods.empty = async function (
 
 collectionSchema.statics.isSearchingCollection = function (
 	doc: Doc<AnyCollection>
-): doc is Doc<ISearchingCollection> {
+): doc is Doc<ISearchingCollection, CollectionMethods> {
 	return doc.type === 'SearchingCollection';
 };
 collectionSchema.statics.isCollection = function (
 	doc: Doc<AnyCollection>
-): doc is Doc<ICollection> {
+): doc is Doc<ICollection, CollectionMethods> {
 	return doc.type === 'Collection';
 };
 
