@@ -3,7 +3,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
-import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
@@ -12,7 +11,6 @@ import Controller from './utils/Controller';
 import errorHandler from './utils/errorHandler';
 
 const app = express();
-const whitelist: string[] = [];
 
 /* security middlewares */
 app

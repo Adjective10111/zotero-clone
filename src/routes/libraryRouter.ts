@@ -23,9 +23,6 @@ router.use(
 	collectionRouter
 );
 
-// // TODO: complete sync
-// router.route('/sync').get().post().patch().delete();
-
 router
 	.route('/')
 	.get(

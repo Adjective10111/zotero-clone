@@ -4,8 +4,6 @@ import Collection, { CollectionDoc, type AnyCollectionDoc } from './Collection';
 import { GroupDoc } from './Group';
 import { type UserDoc } from './User';
 
-const defaultCollectionNames = ['unfiled items', 'duplicates', 'bin'];
-
 interface ILibrary {
 	owner: UserDoc | Types.ObjectId;
 	group?: GroupDoc;

@@ -1,6 +1,4 @@
-import crypto from 'crypto';
 import { NextFunction, Response } from 'express';
-import { Types } from 'mongoose';
 import User, { UserDoc } from '../models/User';
 import Authenticator from '../utils/Authenticator';
 import Controller from '../utils/Controller';

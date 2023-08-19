@@ -1,5 +1,4 @@
 import { NextFunction, Response } from 'express';
-import { Types } from 'mongoose';
 import Collection, { AnyCollectionDoc } from '../models/Collection';
 import Item from '../models/Item';
 import Library, { LibraryDoc } from '../models/Library';
